@@ -1,0 +1,187 @@
+/* ===== VARIÁVEIS DE COR ===== */
+/* Facilitam trocar as cores depois */
+:root {
+  --roxo: #6a3fa0;          /* cor principal */
+  --roxo-escuro: #4e2d78;   /* tom mais escuro do roxo */
+  --lilas: #cdb4e8;         /* cor secundária */
+  --lilas-claro: #f2ebfb;   /* fundo suave dos cards */
+  --texto: #2d2d2d;         /* cor do texto */
+  --cinza: #6b6b6b;         /* texto secundário */
+  --branco: #ffffff;
+}
+
+/* ===== RESET BÁSICO ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #f7f5fb;
+  color: var(--texto);
+  line-height: 1.5;
+}
+
+/* ===== CABEÇALHO ===== */
+.cabecalho {
+  background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
+  color: var(--branco);
+  text-align: center;
+  padding: 32px 16px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  box-shadow: 0 4px 12px rgba(106, 63, 160, 0.25);
+}
+
+.cabecalho h1 {
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+.subtitulo {
+  margin-top: 6px;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* ===== CONTEÚDO PRINCIPAL ===== */
+.conteudo {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* ===== CARDS DE RESUMO ===== */
+.cards-resumo {
+  display: grid;
+  /* Em telas grandes: 5 colunas; no celular: 1 coluna */
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.card {
+  background-color: var(--branco);
+  border-radius: 16px;
+  padding: 20px 12px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(106, 63, 160, 0.12);
+  border-top: 4px solid var(--lilas);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+.card-icone {
+  font-size: 1.6rem;
+  display: block;
+}
+
+.card-valor {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--roxo);
+  margin: 6px 0 4px;
+}
+
+.card-titulo {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--cinza);
+}
+
+/* ===== ÁREA DA TABELA ===== */
+.tabela-area h2 {
+  font-size: 1.3rem;
+  color: var(--roxo-escuro);
+  margin-bottom: 12px;
+}
+
+/* Permite rolagem horizontal no celular */
+.tabela-responsiva {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(106, 63, 160, 0.12);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--branco);
+  min-width: 640px; /* força rolagem em telas pequenas */
+}
+
+thead {
+  background-color: var(--roxo);
+  color: var(--branco);
+}
+
+th, td {
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #eee;
+}
+
+/* Primeira coluna alinhada à esquerda */
+th:first-child, td:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--lilas-claro);
+}
+
+tbody tr:hover {
+  background-color: #ede1fa;
+}
+
+/* ===== SITUAÇÕES (cores por status) ===== */
+.situacao {
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: inline-block;
+  font-size: 0.8rem;
+}
+
+.situacao.bom {
+  background-color: #d6f5dd;
+  color: #1e7a3a;
+}
+
+.situacao.atencao {
+  background-color: #fde2c8;
+  color: #a35a00;
+}
+
+.situacao.indisponivel {
+  background-color: #e4e4e4;
+  color: #666;
+}
+
+/* ===== AJUSTES PARA CELULAR ===== */
+@media (max-width: 600px) {
+  .cabecalho h1 {
+    font-size: 1.5rem;
+  }
+
+  .card-valor {
+    font-size: 1.4rem;
+  }
+
+  .card-icone {
+    font-size: 1.3rem;
+  }
+
+  th, td {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+}
