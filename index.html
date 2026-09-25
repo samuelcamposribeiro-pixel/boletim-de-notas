@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Garante que o site funcione bem em celular -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boletim Digital</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="cabecalho">
+    <h1>Boletim Digital</h1>
+    <p class="subtitulo">8º Ano — Estudante Exemplo</p>
+  </header>
+
+  <main class="conteudo">
+
+    <!-- CARDS DE RESUMO -->
+    <section class="cards-resumo">
+      <div class="card">
+        <span class="card-icone">📊</span>
+        <span class="card-valor" id="media-geral">—</span>
+        <span class="card-titulo">Média geral</span>
+      </div>
+
+      <div class="card">
+        <span class="card-icone">📝</span>
+        <span class="card-valor" id="total-faltas">—</span>
+        <span class="card-titulo">Total de faltas</span>
+      </div>
+
+      <div class="card">
+        <span class="card-icone">✅</span>
+        <span class="card-valor" id="bom-desempenho">—</span>
+        <span class="card-titulo">Bom desempenho</span>
+      </div>
+
+      <div class="card">
+        <span class="card-icone">⚠️</span>
+        <span class="card-valor" id="atencao">—</span>
+        <span class="card-titulo">Precisam de atenção</span>
+      </div>
+
+      <div class="card">
+        <span class="card-icone">📅</span>
+        <span class="card-valor" id="frequencia">—</span>
+        <span class="card-titulo">Frequência demonstrativa</span>
+      </div>
+    </section>
+
+    <!-- TABELA DE DISCIPLINAS -->
+    <section class="tabela-area">
+      <h2>Notas por disciplina</h2>
+
+      <div class="tabela-responsiva">
+        <table>
+          <thead>
+            <tr>
+              <th>Disciplina</th>
+              <th>1º Tri</th>
+              <th>2º Tri</th>
+              <th>3º Tri</th>
+              <th>Média</th>
+              <th>Faltas</th>
+              <th>Situação</th>
+            </tr>
+          </thead>
+          <!-- O JavaScript vai preencher o corpo da tabela -->
+          <tbody id="corpo-tabela"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
