@@ -1,63 +1,50 @@
 // ============================================================
-// DADOS FICTÍCIOS — 8º ANO
-// Estes são os "dados brutos". As notas ainda não estão no
-// formato 0–10, e o JavaScript vai normalizar tudo sozinho.
+// DADOS DICAS — 8º ANO
 // ============================================================
 const disciplinas = [
-  { disciplina: "Língua Portuguesa",          tri1: 82,    tri2: "7,8", tri3: 85,   faltas: [2, 1, 1] },
-  { disciplina: "Matemática",                 tri1: 52,    tri2: "5,8", tri3: null, faltas: [3, 2, 1] },
-  { disciplina: "Ciências",                   tri1: "8,1", tri2: 76,    tri3: 8.0,  faltas: [1, 2, 0] },
-  { disciplina: "História",                   tri1: 7.0,   tri2: 84,    tri3: null, faltas: [1, 1, 1] },
-  { disciplina: "Geografia",                  tri1: 68,    tri2: 7.3,   tri3: "7,9",faltas: [0, 1, 1] },
-  { disciplina: "Língua Inglesa",             tri1: 86,    tri2: "8,1", tri3: 8.7,  faltas: [1, 0, 0] },
-  { disciplina: "Arte",                       tri1: 9.0,   tri2: 92,    tri3: null, faltas: [1, 1, 0] },
-  { disciplina: "Educação Física",            tri1: 95,    tri2: 9.0,   tri3: "9,4",faltas: [0, 1, 0] },
-  { disciplina: "Educação Digital",           tri1: 88,    tri2: 9.1,   tri3: 93,   faltas: [1, 0, 1] },
-  { disciplina: "Educação Financeira",        tri1: 74,    tri2: "7,8", tri3: null, faltas: [1, 1, 1] },
-  { disciplina: "Estudo Orientado",           tri1: 8.0,   tri2: 83,    tri3: "8,5",faltas: [0, 1, 0] },
-  { disciplina: "Redação e Leitura",          tri1: 62,    tri2: "6,8", tri3: null, faltas: [2, 1, 1] },
-  { disciplina: "Pensamento Lógico",          tri1: 48,    tri2: 5.6,   tri3: "6,0",faltas: [2, 2, 1] },
-  { disciplina: "Literatura Arte e Movimento",tri1: "7,7", tri2: 80,    tri3: null, faltas: [1, 0, 1] },
-  { disciplina: "Práticas Experimentais",     tri1: 58,    tri2: "6,2", tri3: 6.4,  faltas: [1, 1, 1] }
+  { disciplina: "Língua Portuguesa",          tri1: "10,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Matemática",                 tri1: "6,3",  tri2: "8,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Ciências",                   tri1: "8,6",  tri2: "8,8", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "História",                   tri1: "10,0", tri2: "9,4", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Geografia",                  tri1: "8,4",  tri2: "7,7", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Língua Inglesa",             tri1: "9,1",  tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Arte",                       tri1: "10,0", tri2: "9,3", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Educação Física",            tri1: "9,2",  tri2: "9,2", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Educação Digital",           tri1: "10,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Educação Financeira",        tri1: "10,0", tri2: "10,0",tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Estudo Orientado",           tri1: "10,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Redação e Leitura",          tri1: "7,6",  tri2: "8,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Pensamento Lógico",          tri1: "10,0", tri2: "10,0",tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Literatura Arte e Movimento",tri1: "9,0",  tri2: "6,2", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Práticas Experimentais",     tri1: "7,6",  tri2: "9,6", tri3: null, faltas: [0, 0, 0] }
 ];
 
 // Constante usada nas regras de situação
 const MEDIA_MINIMA = 6.0;
 
-// Frequência FICTÍCIA (apenas demonstrativa nesta etapa).
-// Em versões futuras ela será calculada de outra forma.
+// Frequência DEMONSTRATIVA
 const FREQUENCIA_DEMONSTRATIVA = 92;
 
 // ============================================================
 // FUNÇÃO: normalizarNota(valor)
-// Converte qualquer nota para a escala 0–10.
-// Retorna null quando a nota ainda não foi lançada.
 // ============================================================
 function normalizarNota(valor) {
-  // Vazio, null ou undefined = nota ainda não lançada
   if (valor === null || valor === undefined || valor === "") return null;
 
-  // Aceita ponto ou vírgula decimal
   const numero = typeof valor === "string"
     ? parseFloat(valor.replace(",", "."))
     : valor;
 
-  // Se não for número válido, ignora
   if (isNaN(numero)) return null;
 
-  // Entre 0 e 10: mantém
   if (numero >= 0 && numero <= 10) return Number(numero.toFixed(1));
-
-  // Maior que 10 e até 100: divide por 10
   if (numero > 10 && numero <= 100) return Number((numero / 10).toFixed(1));
 
-  // Fora das regras: inválido
   return null;
 }
 
 // ============================================================
 // FUNÇÃO: formatarNota(nota)
-// Devolve o texto que vai aparecer na tabela.
 // ============================================================
 function formatarNota(nota) {
   if (nota === null) return "Ainda não lançada";
@@ -66,8 +53,6 @@ function formatarNota(nota) {
 
 // ============================================================
 // FUNÇÃO: calcularMedia(notas)
-// Média usando SOMENTE notas disponíveis.
-// Nota ausente nunca vira zero.
 // ============================================================
 function calcularMedia(notas) {
   const validas = notas.filter(n => n !== null);
@@ -78,7 +63,6 @@ function calcularMedia(notas) {
 
 // ============================================================
 // FUNÇÃO: somarFaltas(faltas)
-// Soma os três trimestres.
 // ============================================================
 function somarFaltas(faltas) {
   return faltas.reduce((acc, f) => acc + f, 0);
@@ -86,7 +70,6 @@ function somarFaltas(faltas) {
 
 // ============================================================
 // FUNÇÃO: definirSituacao(media)
-// Aplica as regras de situação.
 // ============================================================
 function definirSituacao(media) {
   if (media === null) return "Nota ainda não disponível";
@@ -96,7 +79,6 @@ function definirSituacao(media) {
 
 // ============================================================
 // FUNÇÃO: classeSituacao(situacao)
-// Devolve a classe CSS correspondente à situação.
 // ============================================================
 function classeSituacao(situacao) {
   if (situacao === "Bom desempenho") return "situacao bom";
@@ -106,7 +88,6 @@ function classeSituacao(situacao) {
 
 // ============================================================
 // FUNÇÃO: criarCelula(texto, classe)
-// Cria uma célula <td> já com o texto e a classe opcional.
 // ============================================================
 function criarCelula(texto, classe) {
   const td = document.createElement("td");
@@ -117,13 +98,11 @@ function criarCelula(texto, classe) {
 
 // ============================================================
 // FUNÇÃO: preencherTabela()
-// Percorre o array de disciplinas e monta as linhas da tabela.
 // ============================================================
 function preencherTabela() {
   const corpo = document.getElementById("corpo-tabela");
 
   disciplinas.forEach(item => {
-    // Normaliza cada nota
     const n1 = normalizarNota(item.tri1);
     const n2 = normalizarNota(item.tri2);
     const n3 = normalizarNota(item.tri3);
@@ -132,7 +111,6 @@ function preencherTabela() {
     const faltas = somarFaltas(item.faltas);
     const situacao = definirSituacao(media);
 
-    // Cria a linha
     const tr = document.createElement("tr");
 
     tr.appendChild(criarCelula(item.disciplina));
@@ -141,11 +119,9 @@ function preencherTabela() {
     tr.appendChild(criarCelula(formatarNota(n3)));
     tr.appendChild(criarCelula(media === null ? "—" : media.toFixed(1).replace(".", ",")));
 
-    // Faltas em badge simples
     const tdFaltas = criarCelula(faltas);
     tr.appendChild(tdFaltas);
 
-    // Situação com classe de cor
     tr.appendChild(criarCelula(situacao, classeSituacao(situacao)));
 
     corpo.appendChild(tr);
@@ -154,7 +130,6 @@ function preencherTabela() {
 
 // ============================================================
 // FUNÇÃO: preencherCards()
-// Calcula e mostra os valores dos cards de resumo.
 // ============================================================
 function preencherCards() {
   let somaMedias = 0;
@@ -192,7 +167,6 @@ function preencherCards() {
 
 // ============================================================
 // EXECUÇÃO
-// Quando a página termina de carregar, monta tabela e cards.
 // ============================================================
 preencherTabela();
 preencherCards();
