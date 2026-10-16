@@ -296,4 +296,76 @@ button:disabled {
   background-color: var(--lilas);
 }
 
-.barr
+.barra-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 24px;
+}
+
+/* ===== MENSAGENS ===== */
+.mensagem {
+  min-height: 1.4em;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--cinza);
+}
+
+.mensagem.erro {
+  color: #b3261e;
+}
+
+.mensagem.sucesso {
+  color: #1e7a3a;
+}
+
+/* ===== ÁREA DE EDIÇÃO ===== */
+.edicao-area {
+  margin-bottom: 32px;
+}
+
+.edicao-area h2 {
+  font-size: 1.3rem;
+  color: var(--roxo-escuro);
+  margin-bottom: 8px;
+}
+
+.edicao-ajuda {
+  font-size: 0.85rem;
+  color: var(--cinza);
+  margin-bottom: 12px;
+}
+
+.edicao-area .barra-acoes {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.edicao-area td input {
+  width: 72px;
+  padding: 6px 8px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Campo com valor inválido */
+.campo-invalido {
+  border-color: #b3261e !important;
+  background-color: #fdecea !important;
+}
+
+.campo-invalido:focus {
+  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.2) !important;
+}
+
+/* ===== AJUSTES PARA CELULAR (novos elementos) ===== */
+@media (max-width: 600px) {
+  .acesso-area {
+    margin: 16px;
+  }
+
+  .edicao-area td input {
+    width: 60px;
+  }
+}
