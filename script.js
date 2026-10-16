@@ -273,4 +273,278 @@ function criarCampoEdicao(valor, rotulo, modo) {
 }
 
 // ============================================================
-// FUNÇÃO:
+// FUNÇÃO: preencherEdicao()
+// Monta os campos de edição com os dados atuais.
+// O nome da disciplina é só texto (não editável).
+// ============================================================
+function preencherEdicao() {
+  const corpo = document.getElementById("corpo-edicao");
+
+  corpo.replaceChildren();
+  camposEdicao = [];
+
+  dadosAtuais.disciplinas.forEach(item => {
+    const tr = document.createElement("tr");
+
+    // Nome da disciplina: somente leitura
+    tr.appendChild(criarCelula(item.disciplina));
+
+    const notas = [];
+    const faltas = [];
+    const chaves = ["tri1", "tri2", "tri3"];
+
+    chaves.forEach((chave, i) => {
+      const nota = normalizarNota(item[chave]);
+      const textoNota = nota === null ? "" : nota.toFixed(1).replace(".", ",");
+      const campo = criarCampoEdicao(
+        textoNota,
+        item.disciplina + " — nota do " + (i + 1) + "º trimestre",
+        "decimal"
+      );
+      const td = document.createElement("td");
+      td.appendChild(campo);
+      tr.appendChild(td);
+      notas.push(campo);
+    });
+
+    for (let i = 0; i < 3; i++) {
+      const bruto = Array.isArray(item.faltas) ? item.faltas[i] : undefined;
+      const textoFalta = (bruto === undefined || bruto === null) ? "0" : String(bruto);
+      const campo = criarCampoEdicao(
+        textoFalta,
+        item.disciplina + " — faltas do " + (i + 1) + "º trimestre",
+        "numeric"
+      );
+      const td = document.createElement("td");
+      td.appendChild(campo);
+      tr.appendChild(td);
+      faltas.push(campo);
+    }
+
+    corpo.appendChild(tr);
+    camposEdicao.push({ notas: notas, faltas: faltas });
+  });
+}
+
+// ============================================================
+// FUNÇÃO: lerCamposEdicao()
+// Valida todos os campos. Se algum for inválido, marca o campo
+// e devolve ok: false (nada é salvo).
+// ============================================================
+function lerCamposEdicao() {
+  const novas = [];
+  let primeiroInvalido = null;
+
+  dadosAtuais.disciplinas.forEach((item, indice) => {
+    const campos = camposEdicao[indice];
+    const notasValidadas = [];
+    const faltasValidadas = [];
+
+    campos.notas.forEach(campo => {
+      const resultado = validarNotaEditor(campo.value);
+      if (!resultado.valido) {
+        campo.classList.add("campo-invalido");
+        if (!primeiroInvalido) primeiroInvalido = campo;
+      }
+      notasValidadas.push(resultado.valor);
+    });
+
+    campos.faltas.forEach(campo => {
+      const resultado = validarFaltaEditor(campo.value);
+      if (!resultado.valido) {
+        campo.classList.add("campo-invalido");
+        if (!primeiroInvalido) primeiroInvalido = campo;
+      }
+      faltasValidadas.push(resultado.valor);
+    });
+
+    novas.push(Object.assign({}, item, {
+      tri1: notasValidadas[0],
+      tri2: notasValidadas[1],
+      tri3: notasValidadas[2],
+      faltas: faltasValidadas
+    }));
+  });
+
+  if (primeiroInvalido) {
+    primeiroInvalido.focus();
+    return { ok: false, disciplinas: null };
+  }
+
+  return { ok: true, disciplinas: novas };
+}
+
+// ============================================================
+// FUNÇÃO: abrirBoletim()
+// POST /api/v1/boletins/abrir
+// ============================================================
+async function abrirBoletim() {
+  if (ocupado) return;
+
+  const campoPin = document.getElementById("campo-pin");
+  const botaoEntrar = document.getElementById("botao-entrar");
+  const mensagem = document.getElementById("mensagem-acesso");
+
+  const pin = campoPin.value.trim();
+
+  if (pin === "") {
+    mostrarMensagem(mensagem, "Digite o PIN para entrar.", "erro");
+    return;
+  }
+
+  ocupado = true;
+  botaoEntrar.disabled = true;
+  mostrarMensagem(mensagem, "Conectando...", "");
+
+  try {
+    const resposta = await fetch(CONFIG_ALUNO.apiUrl + "/api/v1/boletins/abrir", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        turma: CONFIG_ALUNO.turma,
+        numero_chamada: CONFIG_ALUNO.numeroChamada,
+        pin: pin
+      })
+    });
+
+    if (resposta.status === 401) {
+      mostrarMensagem(mensagem, "Turma, chamada ou PIN inválidos.", "erro");
+      return;
+    }
+
+    if (resposta.status === 429) {
+      mostrarMensagem(mensagem, "Muitas tentativas. Aguarde um minuto e tente novamente.", "erro");
+      return;
+    }
+
+    if (!resposta.ok) {
+      mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
+      return;
+    }
+
+    const resultado = await resposta.json();
+
+    // DADOS DA API > DADOS LOCAIS
+    if (resultado && resultado.dados !== null && resultado.dados !== undefined) {
+      if (!Array.isArray(resultado.dados.disciplinas)) {
+        mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
+        return;
+      }
+      dadosAtuais = { disciplinas: resultado.dados.disciplinas };
+    } else {
+      // Sem dados salvos: usa as disciplinas do projeto (sem salvar automaticamente)
+      dadosAtuais = { disciplinas: disciplinas };
+    }
+
+    // Login bem-sucedido: PIN fica só na memória e o campo é limpo
+    pinSessao = pin;
+    campoPin.value = "";
+    mostrarMensagem(mensagem, "", "");
+
+    document.getElementById("area-acesso").hidden = true;
+    document.getElementById("area-boletim").hidden = false;
+
+    atualizarTela();
+  } catch (erro) {
+    mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
+  } finally {
+    ocupado = false;
+    botaoEntrar.disabled = false;
+  }
+}
+
+// ============================================================
+// FUNÇÃO: abrirEdicao()
+// ============================================================
+function abrirEdicao() {
+  preencherEdicao();
+  mostrarMensagem(document.getElementById("mensagem-edicao"), "", "");
+  document.getElementById("area-edicao").hidden = false;
+}
+
+// ============================================================
+// FUNÇÃO: fecharEdicao()
+// ============================================================
+function fecharEdicao() {
+  document.getElementById("area-edicao").hidden = true;
+  mostrarMensagem(document.getElementById("mensagem-edicao"), "", "");
+}
+
+// ============================================================
+// FUNÇÃO: salvarAlteracoes()
+// PUT /api/v1/boletins/salvar
+// ============================================================
+async function salvarAlteracoes() {
+  if (ocupado) return;
+
+  const mensagem = document.getElementById("mensagem-edicao");
+  const botaoSalvar = document.getElementById("botao-salvar");
+
+  const leitura = lerCamposEdicao();
+
+  if (!leitura.ok) {
+    mostrarMensagem(mensagem, "Corrija os campos destacados antes de salvar.", "erro");
+    return;
+  }
+
+  ocupado = true;
+  botaoSalvar.disabled = true;
+  mostrarMensagem(mensagem, "Salvando...", "");
+
+  try {
+    const resposta = await fetch(CONFIG_ALUNO.apiUrl + "/api/v1/boletins/salvar", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        turma: CONFIG_ALUNO.turma,
+        numero_chamada: CONFIG_ALUNO.numeroChamada,
+        pin: pinSessao,
+        dados: {
+          disciplinas: leitura.disciplinas
+        }
+      })
+    });
+
+    if (resposta.status === 401) {
+      mostrarMensagem(mensagem, "Turma, chamada ou PIN inválidos.", "erro");
+      return;
+    }
+
+    if (resposta.status === 429) {
+      mostrarMensagem(mensagem, "Muitas tentativas. Aguarde um minuto e tente novamente.", "erro");
+      return;
+    }
+
+    if (!resposta.ok) {
+      mostrarMensagem(mensagem, "Não foi possível salvar. Tente novamente.", "erro");
+      return;
+    }
+
+    // Sucesso: atualiza os dados mostrados e reconstrói a tela
+    dadosAtuais = { disciplinas: leitura.disciplinas };
+    atualizarTela();
+    preencherEdicao();
+    mostrarMensagem(mensagem, "Dados salvos com sucesso.", "sucesso");
+  } catch (erro) {
+    // Em caso de falha, os campos digitados são mantidos para nova tentativa
+    mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
+  } finally {
+    ocupado = false;
+    botaoSalvar.disabled = false;
+  }
+}
+
+// ============================================================
+// EXECUÇÃO
+// ============================================================
+document.getElementById("acesso-turma").textContent = CONFIG_ALUNO.turma;
+document.getElementById("acesso-chamada").textContent = CONFIG_ALUNO.numeroChamada;
+
+document.getElementById("botao-entrar").addEventListener("click", abrirBoletim);
+document.getElementById("campo-pin").addEventListener("keydown", function (evento) {
+  if (evento.key === "Enter") abrirBoletim();
+});
+
+document.getElementById("botao-alterar").addEventListener("click", abrirEdicao);
+document.getElementById("botao-salvar").addEventListener("click", salvarAlteracoes);
+document.getElementById("botao-cancelar").addEventListener("click", fecharEdicao);
