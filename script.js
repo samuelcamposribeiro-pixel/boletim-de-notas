@@ -13,7 +13,7 @@ const CONFIG_ALUNO = {
 // (usados quando a API não tiver dados salvos)
 // ============================================================
 const disciplinas = [
-  { disciplina: "Língua Portuguesa",          tri1: "10,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
+  { disciplina: "Língua Portuguesa",          tri1: "09,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
   { disciplina: "Matemática",                 tri1: "6,3",  tri2: "8,0", tri3: null, faltas: [2, 4, 0] },
   { disciplina: "Ciências",                   tri1: "8,6",  tri2: "8,8", tri3: null, faltas: [4, 1, 0] },
   { disciplina: "História",                   tri1: "10,0", tri2: "9,4", tri3: null, faltas: [0, 0, 0] },
