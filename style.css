@@ -185,3 +185,115 @@ tbody tr:hover {
     font-size: 0.8rem;
   }
 }
+
+/* ============================================================
+   NOVOS ESTILOS — ACESSO POR PIN, EDIÇÃO E MENSAGENS
+   (acrescentados ao final, sem alterar o visual existente)
+   ============================================================ */
+
+/* Garante que elementos com o atributo hidden fiquem realmente escondidos */
+[hidden] {
+  display: none !important;
+}
+
+/* ===== ÁREA DE ACESSO ===== */
+.acesso-area {
+  max-width: 480px;
+  margin: 24px auto;
+  padding: 24px 20px;
+  background-color: var(--branco);
+  border-radius: 16px;
+  border-top: 4px solid var(--lilas);
+  box-shadow: 0 4px 10px rgba(106, 63, 160, 0.12);
+  text-align: center;
+}
+
+.acesso-area h2 {
+  font-size: 1.3rem;
+  color: var(--roxo-escuro);
+  margin-bottom: 8px;
+}
+
+.acesso-identificacao {
+  font-size: 0.9rem;
+  color: var(--cinza);
+  margin-bottom: 16px;
+}
+
+.acesso-identificacao strong {
+  color: var(--roxo);
+}
+
+.acesso-campos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.acesso-campos label {
+  font-weight: 600;
+  color: var(--roxo-escuro);
+}
+
+.acesso-campos input {
+  flex: 1 1 140px;
+  max-width: 200px;
+}
+
+/* ===== CAMPOS DE TEXTO ===== */
+input[type="password"],
+input[type="text"] {
+  padding: 10px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--texto);
+  background-color: var(--branco);
+  border: 2px solid var(--lilas);
+  border-radius: 10px;
+  outline: none;
+}
+
+input[type="password"]:focus,
+input[type="text"]:focus {
+  border-color: var(--roxo);
+  box-shadow: 0 0 0 3px rgba(106, 63, 160, 0.2);
+}
+
+/* ===== BOTÕES ===== */
+button {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--branco);
+  background-color: var(--roxo);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--roxo-escuro);
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.botao-secundario {
+  color: var(--roxo-escuro);
+  background-color: var(--lilas-claro);
+  border: 2px solid var(--lilas);
+}
+
+.botao-secundario:hover {
+  background-color: var(--lilas);
+}
+
+.barr

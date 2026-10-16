@@ -15,7 +15,28 @@
     <p class="subtitulo">8º Ano — Estudante Exemplo</p>
   </header>
 
-  <main class="conteudo">
+  <!-- ÁREA DE ACESSO POR PIN -->
+  <section class="acesso-area" id="area-acesso">
+    <h2>Acesso ao boletim</h2>
+
+    <!-- Série, turma e chamada apenas para consulta (não editáveis) -->
+    <p class="acesso-identificacao">
+      Série: <strong>8º Ano</strong> •
+      Turma: <strong id="acesso-turma">—</strong> •
+      Chamada: <strong id="acesso-chamada">—</strong>
+    </p>
+
+    <div class="acesso-campos">
+      <label for="campo-pin">PIN</label>
+      <input type="password" id="campo-pin" autocomplete="off" />
+      <button type="button" id="botao-entrar">Entrar</button>
+    </div>
+
+    <p class="mensagem" id="mensagem-acesso" role="status" aria-live="polite"></p>
+  </section>
+
+  <!-- O conteúdo do boletim só aparece depois do login -->
+  <main class="conteudo" id="area-boletim" hidden>
 
     <!-- CARDS DE RESUMO -->
     <section class="cards-resumo">
@@ -48,6 +69,45 @@
         <span class="card-valor" id="frequencia">—</span>
         <span class="card-titulo">Frequência demonstrativa</span>
       </div>
+    </section>
+
+    <!-- BOTÃO PARA EDITAR OS DADOS -->
+    <div class="barra-acoes">
+      <button type="button" id="botao-alterar">Alterar dados</button>
+    </div>
+
+    <!-- ÁREA DE EDIÇÃO (aparece somente ao clicar em Alterar dados) -->
+    <section class="edicao-area" id="area-edicao" hidden>
+      <h2>Alterar dados</h2>
+      <p class="edicao-ajuda">
+        Notas: de 0 a 10, com ponto ou vírgula (deixe vazio se ainda não houver nota).
+        Faltas: número inteiro, zero ou maior.
+      </p>
+
+      <div class="tabela-responsiva">
+        <table>
+          <thead>
+            <tr>
+              <th>Disciplina</th>
+              <th>Nota 1º Tri</th>
+              <th>Nota 2º Tri</th>
+              <th>Nota 3º Tri</th>
+              <th>Faltas 1º Tri</th>
+              <th>Faltas 2º Tri</th>
+              <th>Faltas 3º Tri</th>
+            </tr>
+          </thead>
+          <!-- O JavaScript vai preencher os campos de edição -->
+          <tbody id="corpo-edicao"></tbody>
+        </table>
+      </div>
+
+      <div class="barra-acoes">
+        <button type="button" id="botao-salvar">Salvar alterações</button>
+        <button type="button" id="botao-cancelar" class="botao-secundario">Cancelar</button>
+      </div>
+
+      <p class="mensagem" id="mensagem-edicao" role="status" aria-live="polite"></p>
     </section>
 
     <!-- TABELA DE DISCIPLINAS -->

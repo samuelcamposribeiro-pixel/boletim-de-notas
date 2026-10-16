@@ -1,5 +1,16 @@
 // ============================================================
+// CONFIGURAÇÃO FIXA DO ALUNO
+// Turma e número de chamada ficam fixos neste projeto.
+// ============================================================
+const CONFIG_ALUNO = {
+  turma: "8A",
+  numeroChamada: 29,
+  apiUrl: "https://boletim-api.profbt.com.br"
+};
+
+// ============================================================
 // DADOS FICTÍCIOS — 8º ANO
+// (usados quando a API não tiver dados salvos)
 // ============================================================
 const disciplinas = [
   { disciplina: "Língua Portuguesa",          tri1: "10,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
@@ -26,7 +37,24 @@ const MEDIA_MINIMA = 6.0;
 const FREQUENCIA_DEMONSTRATIVA = 92;
 
 // ============================================================
+// ESTADO DA TELA
+// ============================================================
+
+// Dados que estão sendo mostrados agora (API > dados locais)
+let dadosAtuais = { disciplinas: disciplinas };
+
+// PIN digitado pelo estudante: fica SOMENTE em memória
+let pinSessao = null;
+
+// Evita cliques repetidos enquanto uma conexão está em andamento
+let ocupado = false;
+
+// Referências dos campos do editor (uma entrada por disciplina)
+let camposEdicao = [];
+
+// ============================================================
 // FUNÇÃO: normalizarNota(valor)
+// (usada para os dados antigos do projeto e para dados da API)
 // ============================================================
 function normalizarNota(valor) {
   if (valor === null || valor === undefined || valor === "") return null;
@@ -65,7 +93,8 @@ function calcularMedia(notas) {
 // FUNÇÃO: somarFaltas(faltas)
 // ============================================================
 function somarFaltas(faltas) {
-  return faltas.reduce((acc, f) => acc + f, 0);
+  if (!Array.isArray(faltas)) return 0;
+  return faltas.reduce((acc, f) => acc + (Number(f) || 0), 0);
 }
 
 // ============================================================
@@ -98,11 +127,15 @@ function criarCelula(texto, classe) {
 
 // ============================================================
 // FUNÇÃO: preencherTabela()
+// Agora limpa a tabela antes de reconstruir (sem duplicar linhas)
 // ============================================================
 function preencherTabela() {
   const corpo = document.getElementById("corpo-tabela");
 
-  disciplinas.forEach(item => {
+  // Limpa a tabela antes de reconstruir
+  corpo.replaceChildren();
+
+  dadosAtuais.disciplinas.forEach(item => {
     const n1 = normalizarNota(item.tri1);
     const n2 = normalizarNota(item.tri2);
     const n3 = normalizarNota(item.tri3);
@@ -130,6 +163,7 @@ function preencherTabela() {
 
 // ============================================================
 // FUNÇÃO: preencherCards()
+// Os valores são recalculados a cada chamada (sem acumular)
 // ============================================================
 function preencherCards() {
   let somaMedias = 0;
@@ -138,7 +172,7 @@ function preencherCards() {
   let bomDesempenho = 0;
   let atencao = 0;
 
-  disciplinas.forEach(item => {
+  dadosAtuais.disciplinas.forEach(item => {
     const n1 = normalizarNota(item.tri1);
     const n2 = normalizarNota(item.tri2);
     const n3 = normalizarNota(item.tri3);
@@ -166,7 +200,77 @@ function preencherCards() {
 }
 
 // ============================================================
-// EXECUÇÃO
+// FUNÇÃO: atualizarTela()
+// Reconstrói tabela, cards, médias, faltas e situações
 // ============================================================
-preencherTabela();
-preencherCards();
+function atualizarTela() {
+  preencherTabela();
+  preencherCards();
+}
+
+// ============================================================
+// FUNÇÃO: mostrarMensagem(elemento, texto, tipo)
+// tipo pode ser "erro", "sucesso" ou vazio
+// ============================================================
+function mostrarMensagem(elemento, texto, tipo) {
+  elemento.textContent = texto;
+  elemento.className = "mensagem" + (tipo ? " " + tipo : "");
+}
+
+// ============================================================
+// FUNÇÃO: validarNotaEditor(texto)
+// Aceita somente 0 a 10 (ponto ou vírgula) ou vazio.
+// Vazio vira null. Valor inválido NÃO vira null nem zero.
+// ============================================================
+function validarNotaEditor(texto) {
+  const limpo = texto.trim();
+
+  if (limpo === "") return { valido: true, valor: null };
+
+  if (!/^\d+([.,]\d+)?$/.test(limpo)) return { valido: false, valor: null };
+
+  const numero = parseFloat(limpo.replace(",", "."));
+
+  if (isNaN(numero) || numero < 0 || numero > 10) return { valido: false, valor: null };
+
+  return { valido: true, valor: Number(numero.toFixed(1)) };
+}
+
+// ============================================================
+// FUNÇÃO: validarFaltaEditor(texto)
+// Aceita somente número inteiro, zero ou maior.
+// Vazio é inválido e NÃO vira zero.
+// ============================================================
+function validarFaltaEditor(texto) {
+  const limpo = texto.trim();
+
+  if (!/^\d+$/.test(limpo)) return { valido: false, valor: null };
+
+  const numero = Number(limpo);
+
+  if (!Number.isSafeInteger(numero)) return { valido: false, valor: null };
+
+  return { valido: true, valor: numero };
+}
+
+// ============================================================
+// FUNÇÃO: criarCampoEdicao(valor, rotulo, modo)
+// ============================================================
+function criarCampoEdicao(valor, rotulo, modo) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = valor;
+  input.setAttribute("inputmode", modo);
+  input.setAttribute("autocomplete", "off");
+  input.setAttribute("aria-label", rotulo);
+
+  // Ao digitar de novo, tira a marca de erro do campo
+  input.addEventListener("input", () => {
+    input.classList.remove("campo-invalido");
+  });
+
+  return input;
+}
+
+// ============================================================
+// FUNÇÃO:
