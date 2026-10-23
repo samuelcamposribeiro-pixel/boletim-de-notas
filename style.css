@@ -65,8 +65,8 @@ body {
   border-radius: 14px;
   padding: 22px 12px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); /* sombra bem suave */
-  border: 1px solid var(--secundaria);       /* borda cinza clara discreta */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--secundaria);
   transition: transform 0.2s ease;
 }
 
@@ -163,6 +163,155 @@ tbody tr:hover {
   color: #666;
 }
 
+/* ===== ÁREA DE ACESSO POR PIN ===== */
+.acesso-area {
+  max-width: 480px;
+  margin: 32px auto;
+  padding: 24px 20px;
+  background-color: var(--branco);
+  border-radius: 14px;
+  border: 1px solid var(--secundaria);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.acesso-area h2 {
+  font-size: 1.2rem;
+  color: var(--principal-escuro);
+  margin-bottom: 12px;
+}
+
+.acesso-identificacao {
+  font-size: 0.9rem;
+  color: var(--cinza);
+  margin-bottom: 16px;
+}
+
+.acesso-campos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.acesso-campos label {
+  font-weight: 600;
+  color: var(--principal-escuro);
+}
+
+.acesso-campos input {
+  padding: 8px 12px;
+  border: 1px solid var(--secundaria);
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 120px;
+  text-align: center;
+}
+
+.acesso-campos input:focus {
+  outline: 2px solid var(--principal);
+  border-color: var(--principal);
+}
+
+/* ===== BOTÕES ===== */
+button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: var(--principal);
+  color: var(--branco);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+button:hover {
+  background-color: var(--principal-escuro);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.botao-secundario {
+  background-color: var(--secundaria);
+  color: var(--texto);
+}
+
+.botao-secundario:hover {
+  background-color: #d4d4d4;
+}
+
+/* ===== BARRA DE AÇÕES ===== */
+.barra-acoes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+/* ===== ÁREA DE EDIÇÃO ===== */
+.edicao-area {
+  margin-bottom: 32px;
+  padding: 20px;
+  background-color: var(--branco);
+  border-radius: 14px;
+  border: 1px solid var(--secundaria);
+}
+
+.edicao-area h2 {
+  font-size: 1.2rem;
+  color: var(--principal-escuro);
+  margin-bottom: 8px;
+}
+
+.edicao-ajuda {
+  font-size: 0.85rem;
+  color: var(--cinza);
+  margin-bottom: 16px;
+}
+
+.edicao-area table input {
+  width: 100%;
+  max-width: 90px;
+  padding: 6px 8px;
+  border: 1px solid var(--secundaria);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.edicao-area table input:focus {
+  outline: 2px solid var(--principal);
+  border-color: var(--principal);
+}
+
+/* Campo com valor inválido */
+.campo-invalido {
+  border-color: #c0392b !important;
+  background-color: #fdecea;
+}
+
+/* ===== MENSAGENS ===== */
+.mensagem {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  min-height: 1.2em;
+}
+
+.mensagem.erro {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+.mensagem.sucesso {
+  color: #1e7a3a;
+  font-weight: 600;
+}
+
 /* ===== AJUSTES PARA CELULAR ===== */
 @media (max-width: 600px) {
   .cabecalho h1 {
@@ -180,5 +329,10 @@ tbody tr:hover {
   th, td {
     padding: 8px 6px;
     font-size: 0.8rem;
+  }
+
+  .acesso-area {
+    margin: 20px 12px;
+    padding: 18px 14px;
   }
 }
