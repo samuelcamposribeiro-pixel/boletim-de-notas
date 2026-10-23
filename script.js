@@ -36,6 +36,9 @@ const MEDIA_MINIMA = 6.0;
 // Frequência DEMONSTRATIVA
 const FREQUENCIA_DEMONSTRATIVA = 92;
 
+// Referência interna de risco de faltas (NÃO exibir na página)
+const REFERENCIA_FALTAS_RISCO = 350;
+
 // ============================================================
 // ESTADO DA TELA
 // ============================================================
@@ -51,6 +54,11 @@ let ocupado = false;
 
 // Referências dos campos do editor (uma entrada por disciplina)
 let camposEdicao = [];
+
+// Instâncias dos gráficos (recriadas a cada atualização)
+let graficoMedias = null;
+let graficoEvolucao = null;
+let graficoFaltas = null;
 
 // ============================================================
 // FUNÇÃO: normalizarNota(valor)
@@ -200,12 +208,270 @@ function preencherCards() {
 }
 
 // ============================================================
+// GRÁFICOS — CAMADA SOMENTE LEITURA
+// Usam apenas dadosAtuais, sem alterar nada.
+// ============================================================
+
+// Cor principal vinda do CSS (fallback bordô)
+function corPrincipalGrafico() {
+  const valor = getComputedStyle(document.documentElement)
+    .getPropertyValue("--principal").trim();
+  return valor || "#7b1e2b";
+}
+
+// Cinza claro para grades
+function corGradeGrafico() {
+  const valor = getComputedStyle(document.documentElement)
+    .getPropertyValue("--secundaria").trim();
+  return valor || "#e6e6e6";
+}
+
+// Texto do eixo
+function corTextoGrafico() {
+  const valor = getComputedStyle(document.documentElement)
+    .getPropertyValue("--texto").trim();
+  return valor || "#2d2d2d";
+}
+
+// ------------------------------------------------------------
+// atualizarGraficoMedias()
+// Barras horizontais com a média de cada disciplina.
+// ------------------------------------------------------------
+function atualizarGraficoMedias() {
+  const canvas = document.getElementById("graficoMediasDisciplinas");
+  if (!canvas) return;
+
+  if (graficoMedias) {
+    graficoMedias.destroy();
+    graficoMedias = null;
+  }
+
+  const rotulos = [];
+  const valores = [];
+
+  dadosAtuais.disciplinas.forEach(item => {
+    const n1 = normalizarNota(item.tri1);
+    const n2 = normalizarNota(item.tri2);
+    const n3 = normalizarNota(item.tri3);
+    const media = calcularMedia([n1, n2, n3]);
+
+    rotulos.push(item.disciplina);
+    valores.push(media); // null quando não há notas
+  });
+
+  graficoMedias = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: rotulos,
+      datasets: [{
+        label: "Média",
+        data: valores,
+        backgroundColor: corPrincipalGrafico(),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              const v = ctx.parsed.x;
+              if (v === null || v === undefined) return "Sem nota";
+              return v.toFixed(1).replace(".", ",");
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          min: 0,
+          max: 10,
+          ticks: { color: corTextoGrafico() },
+          grid: { color: corGradeGrafico() }
+        },
+        y: {
+          ticks: { color: corTextoGrafico(), autoSkip: false },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// ------------------------------------------------------------
+// atualizarGraficoEvolucao()
+// Linha com a média geral de cada trimestre.
+// ------------------------------------------------------------
+function atualizarGraficoEvolucao() {
+  const canvas = document.getElementById("graficoEvolucaoTrimestres");
+  if (!canvas) return;
+
+  if (graficoEvolucao) {
+    graficoEvolucao.destroy();
+    graficoEvolucao = null;
+  }
+
+  const somas = [0, 0, 0];
+  const contagens = [0, 0, 0];
+  const chaves = ["tri1", "tri2", "tri3"];
+
+  dadosAtuais.disciplinas.forEach(item => {
+    chaves.forEach((chave, i) => {
+      const nota = normalizarNota(item[chave]);
+      if (nota !== null) {
+        somas[i] += nota;
+        contagens[i]++;
+      }
+    });
+  });
+
+  const medias = somas.map((soma, i) => {
+    if (contagens[i] === 0) return null;
+    return Number((soma / contagens[i]).toFixed(1));
+  });
+
+  graficoEvolucao = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels: ["1º Tri", "2º Tri", "3º Tri"],
+      datasets: [{
+        label: "Média geral",
+        data: medias,
+        borderColor: corPrincipalGrafico(),
+        backgroundColor: corPrincipalGrafico(),
+        tension: 0.25,
+        spanGaps: false,
+        pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              const v = ctx.parsed.y;
+              if (v === null || v === undefined) return "Sem nota";
+              return v.toFixed(1).replace(".", ",");
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0,
+          max: 10,
+          ticks: { color: corTextoGrafico() },
+          grid: { color: corGradeGrafico() }
+        },
+        x: {
+          ticks: { color: corTextoGrafico() },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// ------------------------------------------------------------
+// atualizarGraficoFaltas()
+// Três barras: faltas somadas por trimestre.
+// Também controla o badge "Perigo" (referência interna, sem exibir 350).
+// ------------------------------------------------------------
+function atualizarGraficoFaltas() {
+  const canvas = document.getElementById("graficoFaltasTrimestres");
+  if (!canvas) return;
+
+  if (graficoFaltas) {
+    graficoFaltas.destroy();
+    graficoFaltas = null;
+  }
+
+  const faltasPorTri = [0, 0, 0];
+
+  dadosAtuais.disciplinas.forEach(item => {
+    if (!Array.isArray(item.faltas)) return;
+    for (let i = 0; i < 3; i++) {
+      faltasPorTri[i] += Number(item.faltas[i]) || 0;
+    }
+  });
+
+  const total = faltasPorTri[0] + faltasPorTri[1] + faltasPorTri[2];
+  const critico = total >= REFERENCIA_FALTAS_RISCO;
+
+  const badge = document.getElementById("estadoFaltas");
+  const card = document.getElementById("card-faltas");
+
+  if (badge) badge.hidden = !critico;
+  if (card) card.classList.toggle("critico", critico);
+
+  graficoFaltas = new Chart(canvas, {
+    type: "bar",
+    data: {
+      labels: ["1º Tri", "2º Tri", "3º Tri"],
+      datasets: [{
+        label: "Faltas",
+        data: faltasPorTri,
+        backgroundColor: critico ? "#c0392b" : corPrincipalGrafico(),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (ctx) {
+              const v = ctx.parsed.y;
+              return v + " falta" + (v === 1 ? "" : "s");
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: corTextoGrafico(), precision: 0 },
+          grid: { color: corGradeGrafico() }
+        },
+        x: {
+          ticks: { color: corTextoGrafico() },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// ------------------------------------------------------------
+// atualizarGraficos()
+// Chamada após a tela já estar atualizada.
+// ------------------------------------------------------------
+function atualizarGraficos() {
+  // Chart.js precisa estar disponível
+  if (typeof Chart === "undefined") return;
+
+  atualizarGraficoMedias();
+  atualizarGraficoEvolucao();
+  atualizarGraficoFaltas();
+}
+
+// ============================================================
 // FUNÇÃO: atualizarTela()
-// Reconstrói tabela, cards, médias, faltas e situações
+// Reconstrói tabela, cards e gráficos.
 // ============================================================
 function atualizarTela() {
   preencherTabela();
   preencherCards();
+  atualizarGraficos();
 }
 
 // ============================================================
