@@ -1,10 +1,10 @@
 /* ===== VARIÁVEIS DE COR ===== */
 /* Facilitam trocar as cores depois */
 :root {
-  --roxo: #6a3fa0;          /* cor principal */
-  --roxo-escuro: #4e2d78;   /* tom mais escuro do roxo */
-  --lilas: #cdb4e8;         /* cor secundária */
-  --lilas-claro: #f2ebfb;   /* fundo suave dos cards */
+  --roxo: #7b1e2b;          /* BORDÔ — cor principal */
+  --roxo-escuro: #5a121c;   /* bordô mais escuro */
+  --lilas: #d9c7a3;         /* BEGE — cor secundária */
+  --lilas-claro: #f5efe2;   /* bege bem claro — fundo suave */
   --texto: #2d2d2d;         /* cor do texto */
   --cinza: #6b6b6b;         /* texto secundário */
   --branco: #ffffff;
@@ -19,7 +19,7 @@
 
 body {
   font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #f7f5fb;
+  background-color: #faf7f2;
   color: var(--texto);
   line-height: 1.5;
 }
@@ -32,7 +32,7 @@ body {
   padding: 32px 16px;
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
-  box-shadow: 0 4px 12px rgba(106, 63, 160, 0.25);
+  box-shadow: 0 4px 12px rgba(123, 30, 43, 0.25);
 }
 
 .cabecalho h1 {
@@ -56,7 +56,6 @@ body {
 /* ===== CARDS DE RESUMO ===== */
 .cards-resumo {
   display: grid;
-  /* Em telas grandes: 5 colunas; no celular: 1 coluna */
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
   margin-bottom: 32px;
@@ -67,7 +66,7 @@ body {
   border-radius: 16px;
   padding: 20px 12px;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(106, 63, 160, 0.12);
+  box-shadow: 0 4px 10px rgba(123, 30, 43, 0.12);
   border-top: 4px solid var(--lilas);
   transition: transform 0.2s ease;
 }
@@ -102,18 +101,17 @@ body {
   margin-bottom: 12px;
 }
 
-/* Permite rolagem horizontal no celular */
 .tabela-responsiva {
   overflow-x: auto;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(106, 63, 160, 0.12);
+  box-shadow: 0 4px 10px rgba(123, 30, 43, 0.12);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--branco);
-  min-width: 640px; /* força rolagem em telas pequenas */
+  min-width: 640px;
 }
 
 thead {
@@ -128,7 +126,6 @@ th, td {
   border-bottom: 1px solid #eee;
 }
 
-/* Primeira coluna alinhada à esquerda */
 th:first-child, td:first-child {
   text-align: left;
   font-weight: 600;
@@ -139,10 +136,10 @@ tbody tr:nth-child(even) {
 }
 
 tbody tr:hover {
-  background-color: #ede1fa;
+  background-color: #efe6d4;
 }
 
-/* ===== SITUAÇÕES (cores por status) ===== */
+/* ===== SITUAÇÕES ===== */
 .situacao {
   font-weight: bold;
   padding: 4px 8px;
@@ -183,189 +180,5 @@ tbody tr:hover {
   th, td {
     padding: 8px 6px;
     font-size: 0.8rem;
-  }
-}
-
-/* ============================================================
-   NOVOS ESTILOS — ACESSO POR PIN, EDIÇÃO E MENSAGENS
-   (acrescentados ao final, sem alterar o visual existente)
-   ============================================================ */
-
-/* Garante que elementos com o atributo hidden fiquem realmente escondidos */
-[hidden] {
-  display: none !important;
-}
-
-/* ===== ÁREA DE ACESSO ===== */
-.acesso-area {
-  max-width: 480px;
-  margin: 24px auto;
-  padding: 24px 20px;
-  background-color: var(--branco);
-  border-radius: 16px;
-  border-top: 4px solid var(--lilas);
-  box-shadow: 0 4px 10px rgba(106, 63, 160, 0.12);
-  text-align: center;
-}
-
-.acesso-area h2 {
-  font-size: 1.3rem;
-  color: var(--roxo-escuro);
-  margin-bottom: 8px;
-}
-
-.acesso-identificacao {
-  font-size: 0.9rem;
-  color: var(--cinza);
-  margin-bottom: 16px;
-}
-
-.acesso-identificacao strong {
-  color: var(--roxo);
-}
-
-.acesso-campos {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.acesso-campos label {
-  font-weight: 600;
-  color: var(--roxo-escuro);
-}
-
-.acesso-campos input {
-  flex: 1 1 140px;
-  max-width: 200px;
-}
-
-/* ===== CAMPOS DE TEXTO ===== */
-input[type="password"],
-input[type="text"] {
-  padding: 10px 12px;
-  font-size: 1rem;
-  font-family: inherit;
-  color: var(--texto);
-  background-color: var(--branco);
-  border: 2px solid var(--lilas);
-  border-radius: 10px;
-  outline: none;
-}
-
-input[type="password"]:focus,
-input[type="text"]:focus {
-  border-color: var(--roxo);
-  box-shadow: 0 0 0 3px rgba(106, 63, 160, 0.2);
-}
-
-/* ===== BOTÕES ===== */
-button {
-  padding: 10px 20px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  font-family: inherit;
-  color: var(--branco);
-  background-color: var(--roxo);
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-button:hover {
-  background-color: var(--roxo-escuro);
-  transform: translateY(-1px);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.botao-secundario {
-  color: var(--roxo-escuro);
-  background-color: var(--lilas-claro);
-  border: 2px solid var(--lilas);
-}
-
-.botao-secundario:hover {
-  background-color: var(--lilas);
-}
-
-.barra-acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0 0 24px;
-}
-
-/* ===== MENSAGENS ===== */
-.mensagem {
-  min-height: 1.4em;
-  margin-top: 12px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--cinza);
-}
-
-.mensagem.erro {
-  color: #b3261e;
-}
-
-.mensagem.sucesso {
-  color: #1e7a3a;
-}
-
-/* ===== ÁREA DE EDIÇÃO ===== */
-.edicao-area {
-  margin-bottom: 32px;
-}
-
-.edicao-area h2 {
-  font-size: 1.3rem;
-  color: var(--roxo-escuro);
-  margin-bottom: 8px;
-}
-
-.edicao-ajuda {
-  font-size: 0.85rem;
-  color: var(--cinza);
-  margin-bottom: 12px;
-}
-
-.edicao-area .barra-acoes {
-  margin-top: 16px;
-  margin-bottom: 0;
-}
-
-.edicao-area td input {
-  width: 72px;
-  padding: 6px 8px;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Campo com valor inválido */
-.campo-invalido {
-  border-color: #b3261e !important;
-  background-color: #fdecea !important;
-}
-
-.campo-invalido:focus {
-  box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.2) !important;
-}
-
-/* ===== AJUSTES PARA CELULAR (novos elementos) ===== */
-@media (max-width: 600px) {
-  .acesso-area {
-    margin: 16px;
-  }
-
-  .edicao-area td input {
-    width: 60px;
   }
 }
