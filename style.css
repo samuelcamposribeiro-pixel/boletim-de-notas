@@ -1,12 +1,11 @@
 /* ===== VARIÁVEIS DE COR ===== */
-/* Facilitam trocar as cores depois */
 :root {
-  --roxo: #7b1e2b;          /* BORDÔ — cor principal */
-  --roxo-escuro: #5a121c;   /* bordô mais escuro */
-  --lilas: #d9c7a3;         /* BEGE — cor secundária */
-  --lilas-claro: #f5efe2;   /* bege bem claro — fundo suave */
-  --texto: #2d2d2d;         /* cor do texto */
-  --cinza: #6b6b6b;         /* texto secundário */
+  --principal: #7b1e2b;        /* BORDÔ — cor principal */
+  --principal-escuro: #5a121c; /* bordô mais escuro */
+  --secundaria: #e6e6e6;       /* CINZA CLARO — cor secundária */
+  --secundaria-suave: #f4f4f4; /* cinza bem claro */
+  --texto: #2d2d2d;
+  --cinza: #6b6b6b;
   --branco: #ffffff;
 }
 
@@ -19,20 +18,20 @@
 
 body {
   font-family: "Segoe UI", Arial, sans-serif;
-  background-color: #faf7f2;
+  background-color: #fafafa;
   color: var(--texto);
   line-height: 1.5;
 }
 
 /* ===== CABEÇALHO ===== */
 .cabecalho {
-  background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
+  background: linear-gradient(135deg, var(--principal), var(--principal-escuro));
   color: var(--branco);
   text-align: center;
   padding: 32px 16px;
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
-  box-shadow: 0 4px 12px rgba(123, 30, 43, 0.25);
+  box-shadow: 0 4px 12px rgba(123, 30, 43, 0.2);
 }
 
 .cabecalho h1 {
@@ -53,7 +52,7 @@ body {
   padding: 24px 16px 48px;
 }
 
-/* ===== CARDS DE RESUMO ===== */
+/* ===== CARDS DE RESUMO (MINIMALISTAS) ===== */
 .cards-resumo {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -63,28 +62,29 @@ body {
 
 .card {
   background-color: var(--branco);
-  border-radius: 16px;
-  padding: 20px 12px;
+  border-radius: 14px;
+  padding: 22px 12px;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(123, 30, 43, 0.12);
-  border-top: 4px solid var(--lilas);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); /* sombra bem suave */
+  border: 1px solid var(--secundaria);       /* borda cinza clara discreta */
   transition: transform 0.2s ease;
 }
 
 .card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
 }
 
 .card-icone {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   display: block;
+  opacity: 0.85;
 }
 
 .card-valor {
   display: block;
   font-size: 1.8rem;
   font-weight: bold;
-  color: var(--roxo);
+  color: var(--principal);
   margin: 6px 0 4px;
 }
 
@@ -97,14 +97,14 @@ body {
 /* ===== ÁREA DA TABELA ===== */
 .tabela-area h2 {
   font-size: 1.3rem;
-  color: var(--roxo-escuro);
+  color: var(--principal-escuro);
   margin-bottom: 12px;
 }
 
 .tabela-responsiva {
   overflow-x: auto;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(123, 30, 43, 0.12);
+  border: 1px solid var(--secundaria);
 }
 
 table {
@@ -115,7 +115,7 @@ table {
 }
 
 thead {
-  background-color: var(--roxo);
+  background-color: var(--principal);
   color: var(--branco);
 }
 
@@ -123,7 +123,7 @@ th, td {
   padding: 12px 10px;
   text-align: center;
   font-size: 0.9rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--secundaria);
 }
 
 th:first-child, td:first-child {
@@ -132,11 +132,11 @@ th:first-child, td:first-child {
 }
 
 tbody tr:nth-child(even) {
-  background-color: var(--lilas-claro);
+  background-color: var(--secundaria-suave);
 }
 
 tbody tr:hover {
-  background-color: #efe6d4;
+  background-color: #ececec;
 }
 
 /* ===== SITUAÇÕES ===== */
@@ -174,7 +174,7 @@ tbody tr:hover {
   }
 
   .card-icone {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
 
   th, td {
