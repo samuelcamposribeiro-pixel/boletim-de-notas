@@ -163,6 +163,14 @@ tbody tr:hover {
   color: #666;
 }
 
+/* ===== SITUAÇÃO RUIM (vermelho destacado) ===== */
+.situacao.ruim {
+  background-color: #c0392b;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: 0.3px;
+}
+
 /* ===== ÁREA DE ACESSO POR PIN ===== */
 .acesso-area {
   max-width: 480px;
