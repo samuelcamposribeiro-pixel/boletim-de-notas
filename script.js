@@ -107,19 +107,25 @@ function somarFaltas(faltas) {
 
 // ============================================================
 // FUNÇÃO: definirSituacao(media)
+// Regras: sem nota / Aprovado / Atenção / Ruim
+// - Aprovado: média >= 6,0
+// - Atenção: média exatamente 5,0
+// - Ruim: média < 5,0
 // ============================================================
 function definirSituacao(media) {
   if (media === null) return "Nota ainda não disponível";
-  if (media >= MEDIA_MINIMA) return "Bom desempenho";
-  return "Atenção";
+  if (media >= MEDIA_MINIMA) return "Aprovado";
+  if (media === 5.0) return "Atenção";
+  return "Ruim";
 }
 
 // ============================================================
 // FUNÇÃO: classeSituacao(situacao)
 // ============================================================
 function classeSituacao(situacao) {
-  if (situacao === "Bom desempenho") return "situacao bom";
+  if (situacao === "Aprovado") return "situacao bom";
   if (situacao === "Atenção") return "situacao atencao";
+  if (situacao === "Ruim") return "situacao ruim";
   return "situacao indisponivel";
 }
 
