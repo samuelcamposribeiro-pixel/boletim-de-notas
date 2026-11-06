@@ -158,17 +158,15 @@ tbody tr:hover {
   color: #a35a00;
 }
 
+.situacao.mal {
+  background-color: #b71c1c;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px #ff8a80 inset;
+}
+
 .situacao.indisponivel {
   background-color: #e4e4e4;
   color: #666;
-}
-
-/* ===== SITUAÇÃO RUIM (vermelho destacado) ===== */
-.situacao.ruim {
-  background-color: #c0392b;
-  color: #ffffff;
-  font-weight: bold;
-  letter-spacing: 0.3px;
 }
 
 /* ===== ÁREA DE ACESSO POR PIN ===== */
