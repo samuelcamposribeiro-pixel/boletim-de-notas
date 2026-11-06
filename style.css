@@ -158,10 +158,11 @@ tbody tr:hover {
   color: #a35a00;
 }
 
+/* NOVO: mal desempenho — vermelho destacado */
 .situacao.mal {
-  background-color: #b71c1c;
-  color: #ffffff;
-  box-shadow: 0 0 0 2px #ff8a80 inset;
+  background-color: #fbd6d6;
+  color: #b71c1c;
+  border: 1px solid #e57373;
 }
 
 .situacao.indisponivel {
@@ -318,31 +319,6 @@ button:disabled {
   font-weight: 600;
 }
 
-/* ===== AJUSTES PARA CELULAR ===== */
-@media (max-width: 600px) {
-  .cabecalho h1 {
-    font-size: 1.5rem;
-  }
-
-  .card-valor {
-    font-size: 1.4rem;
-  }
-
-  .card-icone {
-    font-size: 1.2rem;
-  }
-
-  th, td {
-    padding: 8px 6px;
-    font-size: 0.8rem;
-  }
-
-  .acesso-area {
-    margin: 20px 12px;
-    padding: 18px 14px;
-  }
-}
-
 /* ===== ÁREA DOS GRÁFICOS ===== */
 .area-graficos {
   display: grid;
@@ -401,15 +377,36 @@ button:disabled {
   box-shadow: 0 2px 10px rgba(192, 57, 43, 0.25);
 }
 
-/* Tablet: 2 colunas, terceiro gráfico embaixo */
+/* ===== RESPONSIVIDADE ===== */
 @media (max-width: 900px) {
   .area-graficos {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* Celular: 1 coluna */
 @media (max-width: 600px) {
+  .cabecalho h1 {
+    font-size: 1.5rem;
+  }
+
+  .card-valor {
+    font-size: 1.4rem;
+  }
+
+  .card-icone {
+    font-size: 1.2rem;
+  }
+
+  th, td {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  .acesso-area {
+    margin: 20px 12px;
+    padding: 18px 14px;
+  }
+
   .area-graficos {
     grid-template-columns: 1fr;
   }

@@ -1,4 +1,3 @@
-
 // ============================================================
 // CONFIGURAÇÃO FIXA DO ALUNO
 // Turma e número de chamada ficam fixos neste projeto.
@@ -31,7 +30,7 @@ const disciplinas = [
   { disciplina: "Práticas Experimentais",     tri1: "7,6",  tri2: "9,6", tri3: null, faltas: [3, 1, 0] }
 ];
 
-// Constante usada nas regras de situação
+// Constante usada nas regras de situação (média mínima)
 const MEDIA_MINIMA = 6.0;
 
 // Frequência DEMONSTRATIVA
@@ -41,14 +40,12 @@ const FREQUENCIA_DEMONSTRATIVA = 92;
 const REFERENCIA_FALTAS_RISCO = 350;
 
 // ============================================================
-// METAS DE SOMA POR TRIMESTRE (nova regra de situação)
-// A soma das notas disponíveis é comparada com estas metas.
-// O "trimestre atual" é o mais avançado que já tem nota.
+// LIMITES DE SITUAÇÃO POR TRIMESTRE (soma de notas da disciplina)
 // ============================================================
-const METAS_SOMA = {
-  1: { bom: 60,  atencao: 50  },
-  2: { bom: 120, atencao: 110 },
-  3: { bom: 180, atencao: 170 }
+const LIMITES_SITUACAO = {
+  tri1: { bom: 60,  atencao: 50  },
+  tri2: { bom: 120, atencao: 110 },
+  tri3: { bom: 180, atencao: 170 }
 };
 
 // ============================================================
@@ -118,28 +115,41 @@ function somarFaltas(faltas) {
 }
 
 // ============================================================
-// FUNÇÃO: definirSituacao(notas)
-// Recebe o array [n1, n2, n3] (com null para ausentes).
-// Descobre o trimestre atual (mais avançado com nota).
-// Soma as notas disponíveis e compara com as metas do trimestre.
+// FUNÇÃO: definirSituacao(item)
+// Regra:
+//  - Descobre o trimestre mais avançado com nota válida.
+//  - Soma as notas válidas da disciplina.
+//  - Compara com os limites daquele trimestre:
+//      1º tri: bom ≥60  | atenção 50–59  | mal <50
+//      2º tri: bom ≥120 | atenção 110–119| mal <110
+//      3º tri: bom ≥180 | atenção 170–179| mal <170
+//  - Sem nenhuma nota válida → "Nota ainda não disponível".
 // ============================================================
-function definirSituacao(notas) {
-  // Descobre o trimestre atual (1, 2 ou 3)
-  let trimestreAtual = 0;
-  for (let i = 0; i < notas.length; i++) {
-    if (notas[i] !== null) trimestreAtual = i + 1;
-  }
+function definirSituacao(item) {
+  const n1 = normalizarNota(item.tri1);
+  const n2 = normalizarNota(item.tri2);
+  const n3 = normalizarNota(item.tri3);
 
   // Nenhuma nota lançada
-  if (trimestreAtual === 0) return "Nota ainda não disponível";
+  if (n1 === null && n2 === null && n3 === null) {
+    return "Nota ainda não disponível";
+  }
 
-  // Soma somente as notas disponíveis (null não é zero)
-  const soma = notas.reduce((acc, n) => acc + (n !== null ? n : 0), 0);
+  // Descobre o trimestre mais avançado com nota válida
+  let chaveTrimestre = "tri1";
+  if (n3 !== null) chaveTrimestre = "tri3";
+  else if (n2 !== null) chaveTrimestre = "tri2";
 
-  const meta = METAS_SOMA[trimestreAtual];
+  // Soma somente as notas válidas
+  let soma = 0;
+  if (n1 !== null) soma += n1;
+  if (n2 !== null) soma += n2;
+  if (n3 !== null) soma += n3;
 
-  if (soma >= meta.bom) return "Bom desempenho";
-  if (soma >= meta.atencao) return "Atenção";
+  const limites = LIMITES_SITUACAO[chaveTrimestre];
+
+  if (soma >= limites.bom) return "Bom desempenho";
+  if (soma >= limites.atencao) return "Atenção";
   return "Mal desempenho";
 }
 
@@ -180,7 +190,7 @@ function preencherTabela() {
 
     const media = calcularMedia([n1, n2, n3]);
     const faltas = somarFaltas(item.faltas);
-    const situacao = definirSituacao([n1, n2, n3]);
+    const situacao = definirSituacao(item);
 
     const tr = document.createElement("tr");
 
@@ -201,7 +211,8 @@ function preencherTabela() {
 
 // ============================================================
 // FUNÇÃO: preencherCards()
-// Os valores são recalculados a cada chamada (sem acumular)
+// Os cards de "Bom desempenho" e "Precisam de atenção" continuam
+// olhando a MÉDIA (≥6,0 ou <6,0), como antes.
 // ============================================================
 function preencherCards() {
   let somaMedias = 0;
@@ -216,17 +227,14 @@ function preencherCards() {
     const n3 = normalizarNota(item.tri3);
 
     const media = calcularMedia([n1, n2, n3]);
-    const situacao = definirSituacao([n1, n2, n3]);
-
     totalFaltas += somarFaltas(item.faltas);
 
     if (media !== null) {
       somaMedias += media;
       contMedias++;
+      if (media >= MEDIA_MINIMA) bomDesempenho++;
+      else atencao++;
     }
-
-    if (situacao === "Bom desempenho") bomDesempenho++;
-    else if (situacao === "Atenção") atencao++;
   });
 
   const mediaGeral = contMedias > 0
