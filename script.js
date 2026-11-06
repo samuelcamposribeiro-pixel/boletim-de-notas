@@ -45,9 +45,7 @@ let graficoEvolucao = null;
 let graficoFaltas = null;
 
 // ============================================================
-// FUNÇÃO: normalizarNota(valor)
-// Trata "null", undefined, "", "null" (string), "undefined" e
-// "nan" como ausentes.
+// FUNÇÕES AUXILIARES
 // ============================================================
 function normalizarNota(valor) {
   if (valor === null || valor === undefined) return null;
@@ -86,10 +84,6 @@ function somarFaltas(faltas) {
   return faltas.reduce((acc, f) => acc + (Number(f) || 0), 0);
 }
 
-// ============================================================
-// FUNÇÃO: contarNotasLancadas(n1, n2, n3)
-// Só considera o trimestre se houver nota válida.
-// ============================================================
 function contarNotasLancadas(n1, n2, n3) {
   if (n3 !== null && n3 !== undefined && n3 !== "") return 3;
   if (n2 !== null && n2 !== undefined && n2 !== "") return 2;
@@ -101,9 +95,6 @@ function contarNotasLancadas(n1, n2, n3) {
 // FUNÇÃO: definirSituacao(notas)
 // Soma as notas convertidas para 0–100 e aplica a faixa do
 // último trimestre com nota.
-//   1º Tri: ≥60 Bom | ≥50 Atenção | <50 Mal
-//   2º Tri: ≥120 Bom | ≥110 Atenção | <110 Mal
-//   3º Tri: ≥180 Bom | ≥170 Atenção | <170 Mal
 // ============================================================
 function definirSituacao(notas) {
   const n1 = notas[0];
@@ -211,10 +202,18 @@ function preencherCards() {
   document.getElementById("bom-desempenho").textContent = bomDesempenho;
   document.getElementById("atencao").textContent = atencao;
   document.getElementById("frequencia").textContent = FREQUENCIA_DEMONSTRATIVA + "%";
+
+  // Linha extra: "X de Y • Z%"
+  const totalDisciplinas = dadosAtuais.disciplinas.length;
+  const pct = totalDisciplinas > 0
+    ? (bomDesempenho / totalDisciplinas * 100).toFixed(1).replace(".", ",")
+    : "0";
+  document.getElementById("bom-desempenho-pct").textContent =
+    bomDesempenho + " de " + totalDisciplinas + " • " + pct + "%";
 }
 
 // ============================================================
-// GRÁFICOS — SOMENTE LEITURA
+// GRÁFICOS
 // ============================================================
 function corPrincipalGrafico() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--principal").trim();
@@ -715,14 +714,4 @@ async function salvarAlteracoes() {
 // ============================================================
 // EXECUÇÃO
 // ============================================================
-document.getElementById("acesso-turma").textContent = CONFIG_ALUNO.turma;
-document.getElementById("acesso-chamada").textContent = CONFIG_ALUNO.numeroChamada;
-
-document.getElementById("botao-entrar").addEventListener("click", abrirBoletim);
-document.getElementById("campo-pin").addEventListener("keydown", function (evento) {
-  if (evento.key === "Enter") abrirBoletim();
-});
-
-document.getElementById("botao-alterar").addEventListener("click", abrirEdicao);
-document.getElementById("botao-salvar").addEventListener("click", salvarAlteracoes);
-document.getElementById("botao-cancelar").addEventListener("click", fecharEdicao);
+document.getElementById("acesso-turma").textContent = CONFIG_ALUNO.tur
