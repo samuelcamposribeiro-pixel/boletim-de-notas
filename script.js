@@ -93,8 +93,6 @@ function contarNotasLancadas(n1, n2, n3) {
 
 // ============================================================
 // FUNÇÃO: definirSituacao(notas)
-// Soma as notas convertidas para 0–100 e aplica a faixa do
-// último trimestre com nota.
 // ============================================================
 function definirSituacao(notas) {
   const n1 = notas[0];
@@ -197,23 +195,21 @@ function preencherCards() {
     ? (somaMedias / contMedias).toFixed(1).replace(".", ",")
     : "—";
 
+  // Porcentagem de disciplinas com Bom desempenho
+  const totalDisciplinas = dadosAtuais.disciplinas.length;
+  const porcentagemBom = totalDisciplinas > 0
+    ? Math.round((bomDesempenho / totalDisciplinas) * 100)
+    : 0;
+
   document.getElementById("media-geral").textContent = mediaGeral;
   document.getElementById("total-faltas").textContent = totalFaltas;
-  document.getElementById("bom-desempenho").textContent = bomDesempenho;
+  document.getElementById("bom-desempenho").textContent = porcentagemBom + "%";
   document.getElementById("atencao").textContent = atencao;
   document.getElementById("frequencia").textContent = FREQUENCIA_DEMONSTRATIVA + "%";
-
-  // Linha extra: "X de Y • Z%"
-  const totalDisciplinas = dadosAtuais.disciplinas.length;
-  const pct = totalDisciplinas > 0
-    ? (bomDesempenho / totalDisciplinas * 100).toFixed(1).replace(".", ",")
-    : "0";
-  document.getElementById("bom-desempenho-pct").textContent =
-    bomDesempenho + " de " + totalDisciplinas + " • " + pct + "%";
 }
 
 // ============================================================
-// GRÁFICOS
+// GRÁFICOS — SOMENTE LEITURA
 // ============================================================
 function corPrincipalGrafico() {
   const v = getComputedStyle(document.documentElement).getPropertyValue("--principal").trim();
@@ -714,4 +710,14 @@ async function salvarAlteracoes() {
 // ============================================================
 // EXECUÇÃO
 // ============================================================
-document.getElementById("acesso-turma").textContent = CONFIG_ALUNO.tur
+document.getElementById("acesso-turma").textContent = CONFIG_ALUNO.turma;
+document.getElementById("acesso-chamada").textContent = CONFIG_ALUNO.numeroChamada;
+
+document.getElementById("botao-entrar").addEventListener("click", abrirBoletim);
+document.getElementById("campo-pin").addEventListener("keydown", function (evento) {
+  if (evento.key === "Enter") abrirBoletim();
+});
+
+document.getElementById("botao-alterar").addEventListener("click", abrirEdicao);
+document.getElementById("botao-salvar").addEventListener("click", salvarAlteracoes);
+document.getElementById("botao-cancelar").addEventListener("click", fecharEdicao);
