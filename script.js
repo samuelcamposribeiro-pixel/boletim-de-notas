@@ -45,13 +45,20 @@ let graficoEvolucao = null;
 let graficoFaltas = null;
 
 // ============================================================
-// FUNÇÕES AUXILIARES
+// FUNÇÃO: normalizarNota(valor)
+// Trata "null", undefined, "", "null" (string), "undefined" e
+// "nan" como ausentes.
 // ============================================================
 function normalizarNota(valor) {
-  if (valor === null || valor === undefined || valor === "") return null;
+  if (valor === null || valor === undefined) return null;
+
+  if (typeof valor === "string") {
+    const t = valor.trim().toLowerCase();
+    if (t === "" || t === "null" || t === "undefined" || t === "nan") return null;
+  }
 
   const numero = typeof valor === "string"
-    ? parseFloat(valor.replace(",", "."))
+    ? parseFloat(String(valor).replace(",", "."))
     : valor;
 
   if (isNaN(numero)) return null;
@@ -79,10 +86,14 @@ function somarFaltas(faltas) {
   return faltas.reduce((acc, f) => acc + (Number(f) || 0), 0);
 }
 
+// ============================================================
+// FUNÇÃO: contarNotasLancadas(n1, n2, n3)
+// Só considera o trimestre se houver nota válida.
+// ============================================================
 function contarNotasLancadas(n1, n2, n3) {
-  if (n3 !== null) return 3;
-  if (n2 !== null) return 2;
-  if (n1 !== null) return 1;
+  if (n3 !== null && n3 !== undefined && n3 !== "") return 3;
+  if (n2 !== null && n2 !== undefined && n2 !== "") return 2;
+  if (n1 !== null && n1 !== undefined && n1 !== "") return 1;
   return 0;
 }
 
