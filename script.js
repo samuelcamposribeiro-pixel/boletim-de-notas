@@ -30,7 +30,7 @@ const disciplinas = [
   { disciplina: "Práticas Experimentais",     tri1: "7,6",  tri2: "9,6", tri3: null, faltas: [3, 1, 0] }
 ];
 
-// Constante usada nas regras de situação (média mínima)
+// Constante usada nas regras de situação
 const MEDIA_MINIMA = 6.0;
 
 // Frequência DEMONSTRATIVA
@@ -38,15 +38,6 @@ const FREQUENCIA_DEMONSTRATIVA = 92;
 
 // Referência interna de risco de faltas (NÃO exibir na página)
 const REFERENCIA_FALTAS_RISCO = 350;
-
-// ============================================================
-// LIMITES DE SITUAÇÃO POR TRIMESTRE (soma de notas da disciplina)
-// ============================================================
-const LIMITES_SITUACAO = {
-  tri1: { bom: 60,  atencao: 50  },
-  tri2: { bom: 120, atencao: 110 },
-  tri3: { bom: 180, atencao: 170 }
-};
 
 // ============================================================
 // ESTADO DA TELA
@@ -115,41 +106,55 @@ function somarFaltas(faltas) {
 }
 
 // ============================================================
-// FUNÇÃO: definirSituacao(item)
-// Regra:
-//  - Descobre o trimestre mais avançado com nota válida.
-//  - Soma as notas válidas da disciplina.
-//  - Compara com os limites daquele trimestre:
-//      1º tri: bom ≥60  | atenção 50–59  | mal <50
-//      2º tri: bom ≥120 | atenção 110–119| mal <110
-//      3º tri: bom ≥180 | atenção 170–179| mal <170
-//  - Sem nenhuma nota válida → "Nota ainda não disponível".
+// FUNÇÃO: contarNotasLancadas(n1, n2, n3)
+// Descobre até qual trimestre há nota lançada.
+// Retorna 1, 2, 3 ou 0 (nenhuma nota).
 // ============================================================
-function definirSituacao(item) {
-  const n1 = normalizarNota(item.tri1);
-  const n2 = normalizarNota(item.tri2);
-  const n3 = normalizarNota(item.tri3);
+function contarNotasLancadas(n1, n2, n3) {
+  if (n3 !== null) return 3;
+  if (n2 !== null) return 2;
+  if (n1 !== null) return 1;
+  return 0;
+}
+
+// ============================================================
+// FUNÇÃO: definirSituacao(notas)
+// Recebe o array [n1, n2, n3] (já normalizado) e devolve:
+// "Bom desempenho" | "Atenção" | "Mal desempenho" | "Nota ainda não disponível"
+//
+// Regra: usa a soma das notas lançadas e a faixa do
+// último trimestre com nota.
+//   1º Tri: ≥60 Bom | ≥50 Atenção | <50 Mal
+//   2º Tri: ≥120 Bom | ≥110 Atenção | <110 Mal
+//   3º Tri: ≥180 Bom | ≥170 Atenção | <170 Mal
+// ============================================================
+function definirSituacao(notas) {
+  const n1 = notas[0];
+  const n2 = notas[1];
+  const n3 = notas[2];
+
+  const trimestre = contarNotasLancadas(n1, n2, n3);
 
   // Nenhuma nota lançada
-  if (n1 === null && n2 === null && n3 === null) {
-    return "Nota ainda não disponível";
-  }
+  if (trimestre === 0) return "Nota ainda não disponível";
 
-  // Descobre o trimestre mais avançado com nota válida
-  let chaveTrimestre = "tri1";
-  if (n3 !== null) chaveTrimestre = "tri3";
-  else if (n2 !== null) chaveTrimestre = "tri2";
-
-  // Soma somente as notas válidas
+  // Soma somente as notas válidas (null não entra)
   let soma = 0;
   if (n1 !== null) soma += n1;
   if (n2 !== null) soma += n2;
   if (n3 !== null) soma += n3;
 
-  const limites = LIMITES_SITUACAO[chaveTrimestre];
+  // Faixas por trimestre
+  const faixas = {
+    1: { bom: 60,  atencao: 50  },
+    2: { bom: 120, atencao: 110 },
+    3: { bom: 180, atencao: 170 }
+  };
 
-  if (soma >= limites.bom) return "Bom desempenho";
-  if (soma >= limites.atencao) return "Atenção";
+  const faixa = faixas[trimestre];
+
+  if (soma >= faixa.bom) return "Bom desempenho";
+  if (soma >= faixa.atencao) return "Atenção";
   return "Mal desempenho";
 }
 
@@ -190,7 +195,7 @@ function preencherTabela() {
 
     const media = calcularMedia([n1, n2, n3]);
     const faltas = somarFaltas(item.faltas);
-    const situacao = definirSituacao(item);
+    const situacao = definirSituacao([n1, n2, n3]);
 
     const tr = document.createElement("tr");
 
@@ -211,8 +216,7 @@ function preencherTabela() {
 
 // ============================================================
 // FUNÇÃO: preencherCards()
-// Os cards de "Bom desempenho" e "Precisam de atenção" continuam
-// olhando a MÉDIA (≥6,0 ou <6,0), como antes.
+// Os valores são recalculados a cada chamada (sem acumular)
 // ============================================================
 function preencherCards() {
   let somaMedias = 0;
@@ -227,14 +231,17 @@ function preencherCards() {
     const n3 = normalizarNota(item.tri3);
 
     const media = calcularMedia([n1, n2, n3]);
+    const situacao = definirSituacao([n1, n2, n3]);
+
     totalFaltas += somarFaltas(item.faltas);
 
     if (media !== null) {
       somaMedias += media;
       contMedias++;
-      if (media >= MEDIA_MINIMA) bomDesempenho++;
-      else atencao++;
     }
+
+    if (situacao === "Bom desempenho") bomDesempenho++;
+    else if (situacao === "Atenção") atencao++;
   });
 
   const mediaGeral = contMedias > 0
@@ -497,7 +504,6 @@ function atualizarGraficoFaltas() {
 // Chamada após a tela já estar atualizada.
 // ------------------------------------------------------------
 function atualizarGraficos() {
-  // Chart.js precisa estar disponível
   if (typeof Chart === "undefined") return;
 
   atualizarGraficoMedias();
@@ -591,267 +597,4 @@ function preencherEdicao() {
   camposEdicao = [];
 
   dadosAtuais.disciplinas.forEach(item => {
-    const tr = document.createElement("tr");
-
-    // Nome da disciplina: somente leitura
-    tr.appendChild(criarCelula(item.disciplina));
-
-    const notas = [];
-    const faltas = [];
-    const chaves = ["tri1", "tri2", "tri3"];
-
-    chaves.forEach((chave, i) => {
-      const nota = normalizarNota(item[chave]);
-      const textoNota = nota === null ? "" : nota.toFixed(1).replace(".", ",");
-      const campo = criarCampoEdicao(
-        textoNota,
-        item.disciplina + " — nota do " + (i + 1) + "º trimestre",
-        "decimal"
-      );
-      const td = document.createElement("td");
-      td.appendChild(campo);
-      tr.appendChild(td);
-      notas.push(campo);
-    });
-
-    for (let i = 0; i < 3; i++) {
-      const bruto = Array.isArray(item.faltas) ? item.faltas[i] : undefined;
-      const textoFalta = (bruto === undefined || bruto === null) ? "0" : String(bruto);
-      const campo = criarCampoEdicao(
-        textoFalta,
-        item.disciplina + " — faltas do " + (i + 1) + "º trimestre",
-        "numeric"
-      );
-      const td = document.createElement("td");
-      td.appendChild(campo);
-      tr.appendChild(td);
-      faltas.push(campo);
-    }
-
-    corpo.appendChild(tr);
-    camposEdicao.push({ notas: notas, faltas: faltas });
-  });
-}
-
-// ============================================================
-// FUNÇÃO: lerCamposEdicao()
-// Valida todos os campos. Se algum for inválido, marca o campo
-// e devolve ok: false (nada é salvo).
-// ============================================================
-function lerCamposEdicao() {
-  const novas = [];
-  let primeiroInvalido = null;
-
-  dadosAtuais.disciplinas.forEach((item, indice) => {
-    const campos = camposEdicao[indice];
-    const notasValidadas = [];
-    const faltasValidadas = [];
-
-    campos.notas.forEach(campo => {
-      const resultado = validarNotaEditor(campo.value);
-      if (!resultado.valido) {
-        campo.classList.add("campo-invalido");
-        if (!primeiroInvalido) primeiroInvalido = campo;
-      }
-      notasValidadas.push(resultado.valor);
-    });
-
-    campos.faltas.forEach(campo => {
-      const resultado = validarFaltaEditor(campo.value);
-      if (!resultado.valido) {
-        campo.classList.add("campo-invalido");
-        if (!primeiroInvalido) primeiroInvalido = campo;
-      }
-      faltasValidadas.push(resultado.valor);
-    });
-
-    novas.push(Object.assign({}, item, {
-      tri1: notasValidadas[0],
-      tri2: notasValidadas[1],
-      tri3: notasValidadas[2],
-      faltas: faltasValidadas
-    }));
-  });
-
-  if (primeiroInvalido) {
-    primeiroInvalido.focus();
-    return { ok: false, disciplinas: null };
-  }
-
-  return { ok: true, disciplinas: novas };
-}
-
-// ============================================================
-// FUNÇÃO: abrirBoletim()
-// POST /api/v1/boletins/abrir
-// ============================================================
-async function abrirBoletim() {
-  if (ocupado) return;
-
-  const campoPin = document.getElementById("campo-pin");
-  const botaoEntrar = document.getElementById("botao-entrar");
-  const mensagem = document.getElementById("mensagem-acesso");
-
-  const pin = campoPin.value.trim();
-
-  if (pin === "") {
-    mostrarMensagem(mensagem, "Digite o PIN para entrar.", "erro");
-    return;
-  }
-
-  ocupado = true;
-  botaoEntrar.disabled = true;
-  mostrarMensagem(mensagem, "Conectando...", "");
-
-  try {
-    const resposta = await fetch(CONFIG_ALUNO.apiUrl + "/api/v1/boletins/abrir", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        turma: CONFIG_ALUNO.turma,
-        numero_chamada: CONFIG_ALUNO.numeroChamada,
-        pin: pin
-      })
-    });
-
-    if (resposta.status === 401) {
-      mostrarMensagem(mensagem, "Turma, chamada ou PIN inválidos.", "erro");
-      return;
-    }
-
-    if (resposta.status === 429) {
-      mostrarMensagem(mensagem, "Muitas tentativas. Aguarde um minuto e tente novamente.", "erro");
-      return;
-    }
-
-    if (!resposta.ok) {
-      mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
-      return;
-    }
-
-    const resultado = await resposta.json();
-
-    // DADOS DA API > DADOS LOCAIS
-    if (resultado && resultado.dados !== null && resultado.dados !== undefined) {
-      if (!Array.isArray(resultado.dados.disciplinas)) {
-        mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
-        return;
-      }
-      dadosAtuais = { disciplinas: resultado.dados.disciplinas };
-    } else {
-      // Sem dados salvos: usa as disciplinas do projeto (sem salvar automaticamente)
-      dadosAtuais = { disciplinas: disciplinas };
-    }
-
-    // Login bem-sucedido: PIN fica só na memória e o campo é limpo
-    pinSessao = pin;
-    campoPin.value = "";
-    mostrarMensagem(mensagem, "", "");
-
-    document.getElementById("area-acesso").hidden = true;
-    document.getElementById("area-boletim").hidden = false;
-
-    atualizarTela();
-  } catch (erro) {
-    mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
-  } finally {
-    ocupado = false;
-    botaoEntrar.disabled = false;
-  }
-}
-
-// ============================================================
-// FUNÇÃO: abrirEdicao()
-// ============================================================
-function abrirEdicao() {
-  preencherEdicao();
-  mostrarMensagem(document.getElementById("mensagem-edicao"), "", "");
-  document.getElementById("area-edicao").hidden = false;
-}
-
-// ============================================================
-// FUNÇÃO: fecharEdicao()
-// ============================================================
-function fecharEdicao() {
-  document.getElementById("area-edicao").hidden = true;
-  mostrarMensagem(document.getElementById("mensagem-edicao"), "", "");
-}
-
-// ============================================================
-// FUNÇÃO: salvarAlteracoes()
-// PUT /api/v1/boletins/salvar
-// ============================================================
-async function salvarAlteracoes() {
-  if (ocupado) return;
-
-  const mensagem = document.getElementById("mensagem-edicao");
-  const botaoSalvar = document.getElementById("botao-salvar");
-
-  const leitura = lerCamposEdicao();
-
-  if (!leitura.ok) {
-    mostrarMensagem(mensagem, "Corrija os campos destacados antes de salvar.", "erro");
-    return;
-  }
-
-  ocupado = true;
-  botaoSalvar.disabled = true;
-  mostrarMensagem(mensagem, "Salvando...", "");
-
-  try {
-    const resposta = await fetch(CONFIG_ALUNO.apiUrl + "/api/v1/boletins/salvar", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        turma: CONFIG_ALUNO.turma,
-        numero_chamada: CONFIG_ALUNO.numeroChamada,
-        pin: pinSessao,
-        dados: {
-          disciplinas: leitura.disciplinas
-        }
-      })
-    });
-
-    if (resposta.status === 401) {
-      mostrarMensagem(mensagem, "Turma, chamada ou PIN inválidos.", "erro");
-      return;
-    }
-
-    if (resposta.status === 429) {
-      mostrarMensagem(mensagem, "Muitas tentativas. Aguarde um minuto e tente novamente.", "erro");
-      return;
-    }
-
-    if (!resposta.ok) {
-      mostrarMensagem(mensagem, "Não foi possível salvar. Tente novamente.", "erro");
-      return;
-    }
-
-    // Sucesso: atualiza os dados mostrados e reconstrói a tela
-    dadosAtuais = { disciplinas: leitura.disciplinas };
-    atualizarTela();
-    preencherEdicao();
-    mostrarMensagem(mensagem, "Dados salvos com sucesso.", "sucesso");
-  } catch (erro) {
-    // Em caso de falha, os campos digitados são mantidos para nova tentativa
-    mostrarMensagem(mensagem, "Não foi possível conectar ao servidor. Tente novamente.", "erro");
-  } finally {
-    ocupado = false;
-    botaoSalvar.disabled = false;
-  }
-}
-
-// ============================================================
-// EXECUÇÃO
-// ============================================================
-document.getElementById("acesso-turma").textContent = CONFIG_ALUNO.turma;
-document.getElementById("acesso-chamada").textContent = CONFIG_ALUNO.numeroChamada;
-
-document.getElementById("botao-entrar").addEventListener("click", abrirBoletim);
-document.getElementById("campo-pin").addEventListener("keydown", function (evento) {
-  if (evento.key === "Enter") abrirBoletim();
-});
-
-document.getElementById("botao-alterar").addEventListener("click", abrirEdicao);
-document.getElementById("botao-salvar").addEventListener("click", salvarAlteracoes);
-document.getElementById("botao-cancelar").addEventListener("click", fecharEdicao);
+    const tr = document.createElement("
