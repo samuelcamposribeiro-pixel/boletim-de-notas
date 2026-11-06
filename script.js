@@ -106,26 +106,60 @@ function somarFaltas(faltas) {
 }
 
 // ============================================================
-// FUNÇÃO: definirSituacao(media)
-// Regras: sem nota / Aprovado / Atenção / Ruim
-// - Aprovado: média >= 6,0
-// - Atenção: média exatamente 5,0
-// - Ruim: média < 5,0
+// FUNÇÃO: obterTrimestreAtual()
+// Retorna 1, 2 ou 3 = último trimestre que tem pelo menos
+// uma nota válida em qualquer disciplina.
+// Se nenhum tiver nota, considera 1.
 // ============================================================
-function definirSituacao(media) {
+function obterTrimestreAtual() {
+  const chaves = ["tri1", "tri2", "tri3"];
+  let ultimo = 1;
+
+  for (let i = 0; i < chaves.length; i++) {
+    const temNota = dadosAtuais.disciplinas.some(item =>
+      normalizarNota(item[chaves[i]]) !== null
+    );
+    if (temNota) ultimo = i + 1;
+  }
+
+  return ultimo;
+}
+
+// ============================================================
+// FUNÇÃO: minimoPorTrimestre(trimestre)
+// Soma mínima exigida: 60 (1º), 120 (2º), 180 (3º).
+// ============================================================
+function minimoPorTrimestre(trimestre) {
+  if (trimestre === 3) return 180;
+  if (trimestre === 2) return 120;
+  return 60;
+}
+
+// ============================================================
+// FUNÇÃO: definirSituacao(media, somaNotas, trimestreAtual)
+// Regras:
+//  - sem notas válidas  -> "Nota ainda não disponível"
+//  - soma < mínimo      -> "Ruim"  (vermelho)
+//  - média >= 6         -> "Bom desempenho"
+//  - média < 6          -> "Atenção"
+// ============================================================
+function definirSituacao(media, somaNotas, trimestreAtual) {
   if (media === null) return "Nota ainda não disponível";
-  if (media >= MEDIA_MINIMA) return "Aprovado";
-  if (media === 5.0) return "Atenção";
-  return "Ruim";
+
+  const minimo = minimoPorTrimestre(trimestreAtual);
+  if (somaNotas < minimo) return "Ruim";
+
+  if (media >= MEDIA_MINIMA) return "Bom desempenho";
+  return "Atenção";
 }
 
 // ============================================================
 // FUNÇÃO: classeSituacao(situacao)
 // ============================================================
 function classeSituacao(situacao) {
-  if (situacao === "Aprovado") return "situacao bom";
-  if (situacao === "Atenção") return "situacao atencao";
-  if (situacao === "Ruim") return "situacao ruim";
+  if (situacao === "Bom desempenho") return "situacao bom";
+  if (situacao === "Atenção")       return "situacao atencao";
+  if (situacao === "Ruim")          return "situacao ruim";
   return "situacao indisponivel";
 }
 
@@ -149,14 +183,19 @@ function preencherTabela() {
   // Limpa a tabela antes de reconstruir
   corpo.replaceChildren();
 
+  const trimestreAtual = obterTrimestreAtual();
+
   dadosAtuais.disciplinas.forEach(item => {
     const n1 = normalizarNota(item.tri1);
     const n2 = normalizarNota(item.tri2);
     const n3 = normalizarNota(item.tri3);
 
+    const notasValidas = [n1, n2, n3].filter(n => n !== null);
+    const somaNotas = notasValidas.reduce((acc, n) => acc + n, 0);
+
     const media = calcularMedia([n1, n2, n3]);
     const faltas = somarFaltas(item.faltas);
-    const situacao = definirSituacao(media);
+    const situacao = definirSituacao(media, somaNotas, trimestreAtual);
 
     const tr = document.createElement("tr");
 
@@ -186,19 +225,26 @@ function preencherCards() {
   let bomDesempenho = 0;
   let atencao = 0;
 
+  const trimestreAtual = obterTrimestreAtual();
+
   dadosAtuais.disciplinas.forEach(item => {
     const n1 = normalizarNota(item.tri1);
     const n2 = normalizarNota(item.tri2);
     const n3 = normalizarNota(item.tri3);
 
+    const notasValidas = [n1, n2, n3].filter(n => n !== null);
+    const somaNotas = notasValidas.reduce((acc, n) => acc + n, 0);
+
     const media = calcularMedia([n1, n2, n3]);
+    const situacao = definirSituacao(media, somaNotas, trimestreAtual);
+
     totalFaltas += somarFaltas(item.faltas);
 
     if (media !== null) {
       somaMedias += media;
       contMedias++;
-      if (media >= MEDIA_MINIMA) bomDesempenho++;
-      else atencao++;
+      if (situacao === "Bom desempenho") bomDesempenho++;
+      else if (situacao === "Atenção" || situacao === "Ruim") atencao++;
     }
   });
 
