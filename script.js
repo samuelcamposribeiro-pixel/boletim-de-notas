@@ -1,6 +1,5 @@
 // ============================================================
 // CONFIGURAÇÃO FIXA DO ALUNO
-// Turma e número de chamada ficam fixos neste projeto.
 // ============================================================
 const CONFIG_ALUNO = {
   turma: "8A",
@@ -10,7 +9,6 @@ const CONFIG_ALUNO = {
 
 // ============================================================
 // DADOS FICTÍCIOS — 8º ANO
-// (usados quando a API não tiver dados salvos)
 // ============================================================
 const disciplinas = [
   { disciplina: "Língua Portuguesa",          tri1: "10,0", tri2: "9,0", tri3: null, faltas: [0, 0, 0] },
@@ -30,38 +28,24 @@ const disciplinas = [
   { disciplina: "Práticas Experimentais",     tri1: "7,6",  tri2: "9,6", tri3: null, faltas: [3, 1, 0] }
 ];
 
-// Constante usada nas regras de situação
 const MEDIA_MINIMA = 6.0;
-
-// Frequência DEMONSTRATIVA
 const FREQUENCIA_DEMONSTRATIVA = 92;
-
-// Referência interna de risco de faltas (NÃO exibir na página)
 const REFERENCIA_FALTAS_RISCO = 350;
 
 // ============================================================
 // ESTADO DA TELA
 // ============================================================
-
-// Dados que estão sendo mostrados agora (API > dados locais)
 let dadosAtuais = { disciplinas: disciplinas };
-
-// PIN digitado pelo estudante: fica SOMENTE em memória
 let pinSessao = null;
-
-// Evita cliques repetidos enquanto uma conexão está em andamento
 let ocupado = false;
-
-// Referências dos campos do editor (uma entrada por disciplina)
 let camposEdicao = [];
 
-// Instâncias dos gráficos (recriadas a cada atualização)
 let graficoMedias = null;
 let graficoEvolucao = null;
 let graficoFaltas = null;
 
 // ============================================================
-// FUNÇÃO: normalizarNota(valor)
+// FUNÇÕES AUXILIARES
 // ============================================================
 function normalizarNota(valor) {
   if (valor === null || valor === undefined || valor === "") return null;
@@ -78,17 +62,11 @@ function normalizarNota(valor) {
   return null;
 }
 
-// ============================================================
-// FUNÇÃO: formatarNota(nota)
-// ============================================================
 function formatarNota(nota) {
   if (nota === null) return "Ainda não lançada";
   return nota.toFixed(1).replace(".", ",");
 }
 
-// ============================================================
-// FUNÇÃO: calcularMedia(notas)
-// ============================================================
 function calcularMedia(notas) {
   const validas = notas.filter(n => n !== null);
   if (validas.length === 0) return null;
@@ -96,17 +74,11 @@ function calcularMedia(notas) {
   return Number((soma / validas.length).toFixed(1));
 }
 
-// ============================================================
-// FUNÇÃO: somarFaltas(faltas)
-// ============================================================
 function somarFaltas(faltas) {
   if (!Array.isArray(faltas)) return 0;
   return faltas.reduce((acc, f) => acc + (Number(f) || 0), 0);
 }
 
-// ============================================================
-// FUNÇÃO: contarNotasLancadas(n1, n2, n3)
-// ============================================================
 function contarNotasLancadas(n1, n2, n3) {
   if (n3 !== null) return 3;
   if (n2 !== null) return 2;
@@ -116,7 +88,8 @@ function contarNotasLancadas(n1, n2, n3) {
 
 // ============================================================
 // FUNÇÃO: definirSituacao(notas)
-// Usa a soma das notas lançadas e a faixa do último trimestre.
+// Soma as notas convertidas para 0–100 e aplica a faixa do
+// último trimestre com nota.
 //   1º Tri: ≥60 Bom | ≥50 Atenção | <50 Mal
 //   2º Tri: ≥120 Bom | ≥110 Atenção | <110 Mal
 //   3º Tri: ≥180 Bom | ≥170 Atenção | <170 Mal
@@ -131,9 +104,9 @@ function definirSituacao(notas) {
   if (trimestre === 0) return "Nota ainda não disponível";
 
   let soma = 0;
-  if (n1 !== null) soma += n1;
-  if (n2 !== null) soma += n2;
-  if (n3 !== null) soma += n3;
+  if (n1 !== null) soma += n1 * 10;
+  if (n2 !== null) soma += n2 * 10;
+  if (n3 !== null) soma += n3 * 10;
 
   const faixas = {
     1: { bom: 60,  atencao: 50  },
@@ -148,9 +121,6 @@ function definirSituacao(notas) {
   return "Mal desempenho";
 }
 
-// ============================================================
-// FUNÇÃO: classeSituacao(situacao)
-// ============================================================
 function classeSituacao(situacao) {
   if (situacao === "Bom desempenho") return "situacao bom";
   if (situacao === "Atenção") return "situacao atencao";
@@ -158,9 +128,6 @@ function classeSituacao(situacao) {
   return "situacao indisponivel";
 }
 
-// ============================================================
-// FUNÇÃO: criarCelula(texto, classe)
-// ============================================================
 function criarCelula(texto, classe) {
   const td = document.createElement("td");
   td.textContent = texto;
@@ -169,7 +136,7 @@ function criarCelula(texto, classe) {
 }
 
 // ============================================================
-// FUNÇÃO: preencherTabela()
+// TABELA E CARDS
 // ============================================================
 function preencherTabela() {
   const corpo = document.getElementById("corpo-tabela");
@@ -198,9 +165,6 @@ function preencherTabela() {
   });
 }
 
-// ============================================================
-// FUNÇÃO: preencherCards()
-// ============================================================
 function preencherCards() {
   let somaMedias = 0;
   let contMedias = 0;
@@ -441,9 +405,6 @@ function atualizarGraficos() {
   atualizarGraficoFaltas();
 }
 
-// ============================================================
-// FUNÇÃO: atualizarTela()
-// ============================================================
 function atualizarTela() {
   preencherTabela();
   preencherCards();
@@ -451,16 +412,13 @@ function atualizarTela() {
 }
 
 // ============================================================
-// FUNÇÃO: mostrarMensagem(elemento, texto, tipo)
+// MENSAGENS E VALIDAÇÃO
 // ============================================================
 function mostrarMensagem(elemento, texto, tipo) {
   elemento.textContent = texto;
   elemento.className = "mensagem" + (tipo ? " " + tipo : "");
 }
 
-// ============================================================
-// FUNÇÃO: validarNotaEditor(texto)
-// ============================================================
 function validarNotaEditor(texto) {
   const limpo = texto.trim();
 
@@ -475,9 +433,6 @@ function validarNotaEditor(texto) {
   return { valido: true, valor: Number(numero.toFixed(1)) };
 }
 
-// ============================================================
-// FUNÇÃO: validarFaltaEditor(texto)
-// ============================================================
 function validarFaltaEditor(texto) {
   const limpo = texto.trim();
 
@@ -491,7 +446,7 @@ function validarFaltaEditor(texto) {
 }
 
 // ============================================================
-// FUNÇÃO: criarCampoEdicao(valor, rotulo, modo)
+// EDIÇÃO
 // ============================================================
 function criarCampoEdicao(valor, rotulo, modo) {
   const input = document.createElement("input");
@@ -508,9 +463,6 @@ function criarCampoEdicao(valor, rotulo, modo) {
   return input;
 }
 
-// ============================================================
-// FUNÇÃO: preencherEdicao()
-// ============================================================
 function preencherEdicao() {
   const corpo = document.getElementById("corpo-edicao");
 
@@ -559,9 +511,6 @@ function preencherEdicao() {
   });
 }
 
-// ============================================================
-// FUNÇÃO: lerCamposEdicao()
-// ============================================================
 function lerCamposEdicao() {
   const novas = [];
   let primeiroInvalido = null;
@@ -606,8 +555,7 @@ function lerCamposEdicao() {
 }
 
 // ============================================================
-// FUNÇÃO: abrirBoletim()
-// POST /api/v1/boletins/abrir
+// ABRIR BOLETIM
 // ============================================================
 async function abrirBoletim() {
   if (ocupado) return;
@@ -682,7 +630,7 @@ async function abrirBoletim() {
 }
 
 // ============================================================
-// FUNÇÃO: abrirEdicao()
+// EDITAR / CANCELAR / SALVAR
 // ============================================================
 function abrirEdicao() {
   preencherEdicao();
@@ -690,18 +638,11 @@ function abrirEdicao() {
   document.getElementById("area-edicao").hidden = false;
 }
 
-// ============================================================
-// FUNÇÃO: fecharEdicao()
-// ============================================================
 function fecharEdicao() {
   document.getElementById("area-edicao").hidden = true;
   mostrarMensagem(document.getElementById("mensagem-edicao"), "", "");
 }
 
-// ============================================================
-// FUNÇÃO: salvarAlteracoes()
-// PUT /api/v1/boletins/salvar
-// ============================================================
 async function salvarAlteracoes() {
   if (ocupado) return;
 
