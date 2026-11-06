@@ -91,9 +91,6 @@ function contarNotasLancadas(n1, n2, n3) {
   return 0;
 }
 
-// ============================================================
-// FUNÇÃO: definirSituacao(notas)
-// ============================================================
 function definirSituacao(notas) {
   const n1 = notas[0];
   const n2 = notas[1];
@@ -195,7 +192,6 @@ function preencherCards() {
     ? (somaMedias / contMedias).toFixed(1).replace(".", ",")
     : "—";
 
-  // Porcentagem de disciplinas com Bom desempenho
   const totalDisciplinas = dadosAtuais.disciplinas.length;
   const porcentagemBom = totalDisciplinas > 0
     ? Math.round((bomDesempenho / totalDisciplinas) * 100)
@@ -417,9 +413,6 @@ function atualizarTela() {
   atualizarGraficos();
 }
 
-// ============================================================
-// MENSAGENS E VALIDAÇÃO
-// ============================================================
 function mostrarMensagem(elemento, texto, tipo) {
   elemento.textContent = texto;
   elemento.className = "mensagem" + (tipo ? " " + tipo : "");
@@ -451,9 +444,6 @@ function validarFaltaEditor(texto) {
   return { valido: true, valor: numero };
 }
 
-// ============================================================
-// EDIÇÃO
-// ============================================================
 function criarCampoEdicao(valor, rotulo, modo) {
   const input = document.createElement("input");
   input.type = "text";
@@ -560,9 +550,6 @@ function lerCamposEdicao() {
   return { ok: true, disciplinas: novas };
 }
 
-// ============================================================
-// ABRIR BOLETIM
-// ============================================================
 async function abrirBoletim() {
   if (ocupado) return;
 
@@ -635,9 +622,6 @@ async function abrirBoletim() {
   }
 }
 
-// ============================================================
-// EDITAR / CANCELAR / SALVAR
-// ============================================================
 function abrirEdicao() {
   preencherEdicao();
   mostrarMensagem(document.getElementById("mensagem-edicao"), "", "");
